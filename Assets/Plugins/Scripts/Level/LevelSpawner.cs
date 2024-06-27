@@ -1,24 +1,34 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
 public class LevelSpawner
 {
+    private const string SQUARE_DATA_PATH = "SO/HiddenObjects/Square";
+    
     private readonly SpawnData _spawnData;
-    private readonly MonoFactory _factory;
+    private readonly HiddenObjectFactory _factory;
+    private readonly List<HiddenObjectData> _datas;
 
-    public LevelSpawner(MonoFactory factory, SpawnData spawnData)
+    public LevelSpawner(HiddenObjectFactory factory, SpawnData spawnData)
     {
         _factory = factory;
         
         _spawnData = spawnData;
+
+        _datas = new List<HiddenObjectData>
+        {
+            Resources.Load<HiddenObjectData>(SQUARE_DATA_PATH),
+        };
     }
 
-    public T SpawnAndPlaceEntity<T>(BoxCollider2D levelCollider) where T : MonoBehaviour, IClickable
+    public HiddenObject SpawnAndPlaceHiddenObject(BoxCollider2D levelCollider)
     {
         Vector2 randomPoint = GetRandomPointInCollider(levelCollider.bounds);
 
-        T instance = _factory.SpawnEntity<T>();
+        HiddenObjectData randomData = _datas[Random.Range(0, _datas.Count)];
+        HiddenObject instance = _factory.Create(randomData);
         instance.transform.position = randomPoint;
 
         float randomMultiplier = Random.Range(0.5f, _spawnData.MaxInstanceScale);

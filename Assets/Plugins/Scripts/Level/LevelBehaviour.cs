@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using UniRx;
 using UnityEngine;
 using Zenject;
 
-public class LevelBehaviour : MonoBehaviour
+public class LevelBehaviour : MonoBehaviour, IInitializable
 {
     [SerializeField] private SpawnData _data;
     [SerializeField] private BoxCollider2D _mapBounds;
@@ -13,32 +14,27 @@ public class LevelBehaviour : MonoBehaviour
     private List<IClickable> _clickables;
     
     [Inject]
-    private void Construct(MonoFactory factory, TapInput tapInput)
+    private void Construct(HiddenObjectFactory factory, TapInput tapInput)
     {
         _levelSpawner = new LevelSpawner(factory, _data);
 
         _tapInput = tapInput;
     }
-
-    private void Awake()
+    
+    public void Initialize()
     {
+        Observable.FromEvent<IClickable>(
+                x => _tapInput.OnTouchPerformedEvent += x,
+                x => _tapInput.OnTouchPerformedEvent -= x)
+            .Subscribe(OnEntityClicked);
+        
         _clickables = new List<IClickable>();
         
         for (int i = 0; i < _data.SpawnNumber; i++)
         {
-            HiddenObject newHiddenObject = _levelSpawner.SpawnAndPlaceEntity<HiddenObject>(_mapBounds);
+            HiddenObject newHiddenObject = _levelSpawner.SpawnAndPlaceHiddenObject(_mapBounds);
             _clickables.Add(newHiddenObject);
         }
-    }
-
-    private void OnEnable()
-    {
-        _tapInput.OnTouchPerformedEvent += OnEntityClicked;
-    }
-
-    private void OnDisable()
-    {
-        _tapInput.OnTouchPerformedEvent -= OnEntityClicked;
     }
 
     private void OnDestroy()

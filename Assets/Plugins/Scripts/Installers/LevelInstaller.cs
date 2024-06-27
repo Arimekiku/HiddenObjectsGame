@@ -1,20 +1,16 @@
 ﻿using UnityEngine;
 using Zenject;
 
-public class LevelInstaller : MonoInstaller
+public class LevelInstaller : MonoInstaller<LevelInstaller>
 {
+    [SerializeField] private HiddenObject _hiddenObjectPrefab;
+    [SerializeField] private LevelBehaviour _levelBehaviour;
+    
     public override void InstallBindings()
     {
-        BindFactories();
         BindTapSystem();
-    }
-
-    private void BindFactories()
-    {
-        Container
-            .Bind<MonoFactory>()
-            .FromNew()
-            .AsSingle();
+        BindLevel();
+        BindFactories();
     }
 
     private void BindTapSystem()
@@ -27,5 +23,20 @@ public class LevelInstaller : MonoInstaller
             .Bind<TapInput>()
             .FromInstance(tapInput)
             .AsSingle();
+    }
+
+    private void BindLevel()
+    {
+        Container
+            .BindInterfacesAndSelfTo<LevelBehaviour>()
+            .FromInstance(_levelBehaviour);
+    }
+    
+    private void BindFactories()
+    {
+        Container
+            .BindFactory<HiddenObjectData, HiddenObject, HiddenObjectFactory>()
+            .FromSubContainerResolve()
+            .ByNewContextPrefab<HiddenObjectInstaller>(_hiddenObjectPrefab);
     }
 }

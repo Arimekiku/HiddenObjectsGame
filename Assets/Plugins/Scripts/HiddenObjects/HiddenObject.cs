@@ -1,10 +1,16 @@
 ﻿using System;
 using UnityEngine;
+using Zenject;
 
 public class HiddenObject : MonoBehaviour, IClickable
 {
-    [SerializeField] private HiddenObjectData _data;
-    
+    [Inject] private HiddenObjectData _data;
+
+    private void Awake()
+    {
+        
+    }
+
     public event Action<IClickable> OnClickEvent;
     
     public void Click()
@@ -12,3 +18,5 @@ public class HiddenObject : MonoBehaviour, IClickable
         OnClickEvent?.Invoke(this);
     }
 }
+
+public class HiddenObjectFactory : PlaceholderFactory<HiddenObjectData, HiddenObject> { }
