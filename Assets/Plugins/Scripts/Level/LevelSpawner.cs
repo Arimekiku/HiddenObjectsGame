@@ -1,34 +1,58 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class LevelSpawner
+public class LevelSpawner : IDisposable
 {
-    private const string SQUARE_DATA_PATH = "SO/HiddenObjects/Square";
+    private const string HAMMER_DATA_PATH = "SO/HiddenObjects/Hammer";
+    private const string KETTLE_DATA_PATH = "SO/HiddenObjects/Kettle";
+    private const string SALT_DATA_PATH = "SO/HiddenObjects/Salt";
+    private const string JOYSTICK_DATA_PATH = "SO/HiddenObjects/Joystick";
+    private const string STEERWHEEL_DATA_PATH = "SO/HiddenObjects/Steerwheel";
+    private const string COIN_DATA_PATH = "SO/CoinData";
+    private const string STAR_DATA_PATH = "SO/StarData";
     
     private readonly SpawnData _spawnData;
     private readonly HiddenObjectFactory _factory;
-    private readonly List<HiddenObjectData> _datas;
+    private readonly StarFactory _starFactory;
+    private readonly CoinFactory _coinFactory;
+    private readonly List<CollectableData> _datas;
+    private readonly CoinData _coinData;
+    private readonly StarData _starData;
 
-    public LevelSpawner(HiddenObjectFactory factory, SpawnData spawnData)
+    private LevelSpawner(SpawnData spawnData, HiddenObjectFactory factory, StarFactory starFactory, CoinFactory coinFactory)
     {
-        _factory = factory;
-        
         _spawnData = spawnData;
-
-        _datas = new List<HiddenObjectData>
+        _factory = factory;
+        _starFactory = starFactory;
+        _coinFactory = coinFactory;
+        
+        _datas = new List<CollectableData>
         {
-            Resources.Load<HiddenObjectData>(SQUARE_DATA_PATH),
+            Resources.Load<CollectableData>(HAMMER_DATA_PATH),
+            Resources.Load<CollectableData>(KETTLE_DATA_PATH),
+            Resources.Load<CollectableData>(SALT_DATA_PATH),
+            Resources.Load<CollectableData>(JOYSTICK_DATA_PATH),
+            Resources.Load<CollectableData>(STEERWHEEL_DATA_PATH),
         };
+
+        _coinData = Resources.Load<CoinData>(COIN_DATA_PATH);
+        _starData = Resources.Load<StarData>(STAR_DATA_PATH);
+    }
+    
+    public void Dispose()
+    {
+        _datas.Clear();
     }
 
-    public HiddenObject SpawnAndPlaceHiddenObject(BoxCollider2D levelCollider)
+    public void SpawnAndPlaceHiddenObject(Bounds levelBounds)
     {
-        Vector2 randomPoint = GetRandomPointInCollider(levelCollider.bounds);
+        Vector2 randomPoint = GetRandomPointInCollider(levelBounds);
 
-        HiddenObjectData randomData = _datas[Random.Range(0, _datas.Count)];
-        HiddenObject instance = _factory.Create(randomData);
+        CollectableData randomData = _datas[Random.Range(0, _datas.Count)];
+        HiddenObjectPresenter instance = _factory.Create(randomData);
         instance.transform.position = randomPoint;
 
         float randomMultiplier = Random.Range(0.5f, _spawnData.MaxInstanceScale);
@@ -36,8 +60,34 @@ public class LevelSpawner
 
         float randomRotation = Random.Range(0f, 360);
         instance.transform.rotation = Quaternion.Euler(0, 0, randomRotation);
-        
-        return instance;
+    }
+    
+    public void SpawnAndPlaceCoin(Bounds levelBounds)
+    {
+        Vector2 randomPoint = GetRandomPointInCollider(levelBounds);
+
+        CoinPresenter instance = _coinFactory.Create(_coinData);
+        instance.transform.position = randomPoint;
+
+        float randomMultiplier = Random.Range(0.5f, _spawnData.MaxInstanceScale);
+        instance.transform.localScale *= randomMultiplier;
+
+        float randomRotation = Random.Range(0f, 360);
+        instance.transform.rotation = Quaternion.Euler(0, 0, randomRotation);
+    }
+    
+    public void SpawnAndPlaceStar(Bounds levelBounds)
+    {
+        Vector2 randomPoint = GetRandomPointInCollider(levelBounds);
+
+        StarPresenter instance = _starFactory.Create(_starData);
+        instance.transform.position = randomPoint;
+
+        float randomMultiplier = Random.Range(0.5f, _spawnData.MaxInstanceScale);
+        instance.transform.localScale *= randomMultiplier;
+
+        float randomRotation = Random.Range(0f, 360);
+        instance.transform.rotation = Quaternion.Euler(0, 0, randomRotation);
     }
     
     private Vector2 GetRandomPointInCollider(Bounds mapBounds)
@@ -49,7 +99,7 @@ public class LevelSpawner
             Vector2 convertPosition = new Vector2(xComponent, yComponent);
 
             Collider2D[] collider = Physics2D.OverlapCircleAll(convertPosition, _spawnData.MinRangeBetweenObjects);
-            if (collider.Any(c => c.TryGetComponent(out IClickable _)))
+            if (collider.Any(c => c.TryGetComponent(out ICollectableModel _)))
                 continue;
 
             return convertPosition;
