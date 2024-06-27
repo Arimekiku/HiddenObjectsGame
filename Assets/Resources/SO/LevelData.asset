@@ -12,6 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 220570803497400c87e8bc5b8122ce8b, type: 3}
   m_Name: LevelData
   m_EditorClassIdentifier: 
-  <SpawnNumber>k__BackingField: 10
+  <SpawnNumber>k__BackingField: 5
   <MaxInstanceScale>k__BackingField: 3
-  <MinRangeBetweenObjects>k__BackingField: 3

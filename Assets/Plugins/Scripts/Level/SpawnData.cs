@@ -5,6 +5,5 @@ public class SpawnData : ScriptableObject
 {
     [field: SerializeField] public uint SpawnNumber { get; private set; }
     [field: SerializeField] public uint MaxInstanceScale { get; private set; }
-    [field: SerializeField] public uint MinRangeBetweenObjects { get; private set; }
-    
+    public uint MinRangeBetweenObjects => MaxInstanceScale * 2;
 }
