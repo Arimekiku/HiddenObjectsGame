@@ -1,10 +1,12 @@
 ﻿using UnityEngine;
+using UnityEngine.Serialization;
 using Zenject;
 
 public class LevelInstaller : MonoInstaller<LevelInstaller>
 {
+    [FormerlySerializedAs("_spawnData")]
     [Header("Configs")]
-    [SerializeField] private SpawnData _spawnData;
+    [SerializeField] private LevelSpawnData _levelSpawnData;
 
     [Header("Camera Tracker")] 
     [SerializeField] private CameraTracker _cameraTracker;
@@ -18,7 +20,7 @@ public class LevelInstaller : MonoInstaller<LevelInstaller>
 
     private void BindConfig()
     {
-        Container.BindInstance(_spawnData);
+        Container.BindInstance(_levelSpawnData);
     }
 
     private void BindServices()

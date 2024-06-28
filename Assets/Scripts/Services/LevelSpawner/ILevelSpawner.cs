@@ -2,5 +2,5 @@
 
 public interface ILevelSpawner
 {
-    public void SpawnAndPlaceEntity<T>(Bounds levelBounds) where T : MonoBehaviour, ICollectablePresenter;
+    public T SpawnAndPlaceEntity<T>(Bounds levelBounds) where T : MonoBehaviour, ICollectablePresenter;
 }

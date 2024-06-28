@@ -4,20 +4,20 @@ using Random = UnityEngine.Random;
 
 public class LevelSpawner : ILevelSpawner
 {
-    private readonly SpawnData _spawnData;
+    private readonly LevelSpawnData _levelSpawnData;
     private readonly IFactoryService _factory;
 
     private readonly GameObject _container;
 
-    private LevelSpawner(SpawnData spawnData, IFactoryService factory)
+    private LevelSpawner(LevelSpawnData levelSpawnData, IFactoryService factory)
     {
-        _spawnData = spawnData;
+        _levelSpawnData = levelSpawnData;
         _factory = factory;
 
         _container = new GameObject("Entities");
     }
 
-    public void SpawnAndPlaceEntity<T>(Bounds levelBounds) where T: MonoBehaviour, ICollectablePresenter
+    public T SpawnAndPlaceEntity<T>(Bounds levelBounds) where T: MonoBehaviour, ICollectablePresenter
     {
         T instance = _factory.Create<T>();
         instance.transform.parent = _container.transform;
@@ -25,11 +25,13 @@ public class LevelSpawner : ILevelSpawner
         Vector2 randomPoint = GetRandomPointInCollider(levelBounds);
         instance.transform.position = randomPoint;
 
-        float randomMultiplier = Random.Range(0.5f, _spawnData.MaxInstanceScale);
+        float randomMultiplier = Random.Range(0.5f, _levelSpawnData.MaxInstanceScale);
         instance.transform.localScale *= randomMultiplier;
 
         float randomRotation = Random.Range(0f, 360);
         instance.transform.rotation = Quaternion.Euler(0, 0, randomRotation);
+
+        return instance;
     }
     
     private Vector2 GetRandomPointInCollider(Bounds mapBounds)
@@ -40,7 +42,7 @@ public class LevelSpawner : ILevelSpawner
             float yComponent = Random.Range(mapBounds.min.y, mapBounds.max.y);
             Vector2 convertPosition = new Vector2(xComponent, yComponent);
 
-            Collider2D[] collider = Physics2D.OverlapCircleAll(convertPosition, _spawnData.MinRangeBetweenObjects);
+            Collider2D[] collider = Physics2D.OverlapCircleAll(convertPosition, _levelSpawnData.MinRangeBetweenObjects);
             if (collider.Any(c => c.TryGetComponent(out ICollectableModel _)))
                 continue;
 
