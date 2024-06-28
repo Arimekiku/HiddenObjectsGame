@@ -5,13 +5,13 @@ using Zenject;
 public class HiddenObjectPresenter : MonoBehaviour, ICollectablePresenter
 {
     [SerializeField] private SpriteRenderer _renderer;
-    [SerializeField] private HiddenObjectData _data;
     
     [Inject] private ICollectableModel _model;
+    [Inject] private ISpriteProvider _spriteProvider;
     
-    private void Awake()
+    private async void Awake()
     {
-        Sprite randomSprite = _data.Sprites[Random.Range(0, _data.Sprites.Length)];
+        Sprite randomSprite = await _spriteProvider.Load("ItemSheet[joystick]");
         _renderer.sprite = randomSprite;
     }
     

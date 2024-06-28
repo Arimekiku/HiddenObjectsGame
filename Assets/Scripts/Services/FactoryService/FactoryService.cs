@@ -5,10 +5,10 @@ using Zenject;
 
 public class FactoryService : IFactoryService
 {
-    private const string COIN_PREFAB_PATH = "Prefabs/Coin";
-    private const string STAR_PREFAB_PATH = "Prefabs/Star";
-    private const string HIDDEN_OBJECT_PREFAB_PATH = "Prefabs/HiddenObject";
-
+    private const string COIN_PREFAB_ID = "Prefabs/Coin";
+    private const string STAR_PREFAB_ID = "Prefabs/Star";
+    private const string HIDDEN_OBJECT_PREFAB_ID = "Prefabs/HiddenObject";
+    
     private readonly DiContainer _container;
     private readonly List<ICollectablePresenter> _presenters;
     
@@ -18,9 +18,9 @@ public class FactoryService : IFactoryService
 
         _presenters = new List<ICollectablePresenter>
         {
-            Resources.Load<HiddenObjectPresenter>(HIDDEN_OBJECT_PREFAB_PATH),
-            Resources.Load<CoinPresenter>(COIN_PREFAB_PATH),
-            Resources.Load<StarPresenter>(STAR_PREFAB_PATH),
+            Resources.Load<HiddenObjectPresenter>(HIDDEN_OBJECT_PREFAB_ID),
+            Resources.Load<CoinPresenter>(COIN_PREFAB_ID),
+            Resources.Load<StarPresenter>(STAR_PREFAB_ID),
         };
     }
     

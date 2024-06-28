@@ -1,10 +1,8 @@
 ﻿using UnityEngine;
-using UnityEngine.Serialization;
 using Zenject;
 
 public class LevelInstaller : MonoInstaller<LevelInstaller>
 {
-    [FormerlySerializedAs("_spawnData")]
     [Header("Configs")]
     [SerializeField] private LevelSpawnData _levelSpawnData;
 
@@ -25,6 +23,7 @@ public class LevelInstaller : MonoInstaller<LevelInstaller>
 
     private void BindServices()
     {
+        Container.BindInterfacesAndSelfTo<SpriteProvider>().AsSingle();
         Container.BindInterfacesAndSelfTo<TapHandler>().AsSingle().WithArguments(_cameraTracker);
         Container.BindInterfacesAndSelfTo<LevelSpawner>().AsSingle();
         Container.BindInterfacesAndSelfTo<WalletService>().AsSingle();
