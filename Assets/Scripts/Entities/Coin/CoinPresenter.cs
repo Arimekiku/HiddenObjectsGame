@@ -24,7 +24,7 @@ public class CoinPresenter : MonoBehaviour, ICollectablePresenter
         if (value == false)
             return;
 
-        _walletService.Earn(_data.CoinsAmount);
+        _walletService.Earn(_walletService.Coins, _data.CoinsAmount);
         DestroyImmediate(gameObject);
     }
 }

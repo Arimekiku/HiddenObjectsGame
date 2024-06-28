@@ -7,15 +7,20 @@ public class LevelSpawner : ILevelSpawner
     private readonly SpawnData _spawnData;
     private readonly IFactoryService _factory;
 
+    private readonly GameObject _container;
+
     private LevelSpawner(SpawnData spawnData, IFactoryService factory)
     {
         _spawnData = spawnData;
         _factory = factory;
+
+        _container = new GameObject("Entities");
     }
 
     public void SpawnAndPlaceEntity<T>(Bounds levelBounds) where T: MonoBehaviour, ICollectablePresenter
     {
         T instance = _factory.Create<T>();
+        instance.transform.parent = _container.transform;
 
         Vector2 randomPoint = GetRandomPointInCollider(levelBounds);
         instance.transform.position = randomPoint;

@@ -12,5 +12,6 @@ public class CurrencyPresenter : MonoBehaviour
     private void Awake()
     {
         _walletService.Coins.SubscribeToText(CoinsText);
+        _walletService.Stars.SubscribeToText(StarsText);
     }
 }

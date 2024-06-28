@@ -3,23 +3,26 @@
 public class WalletService : IWalletService
 {
     public IntReactiveProperty Coins { get; }
+    public IntReactiveProperty Stars { get; }
     
     public WalletService()
     {
         Coins = new IntReactiveProperty(0);
+
+        Stars = new IntReactiveProperty(0);
+    }
+    
+    public void Earn(IntReactiveProperty property, int value)
+    {
+        property.Value += value;
     }
 
-    public void Earn(int value)
+    public bool TrySpend(IntReactiveProperty property, int value)
     {
-        Coins.Value += value;
-    }
-
-    public bool TrySpend(int value)
-    {
-        if (Coins.Value < value)
+        if (property.Value < value)
             return false;
 
-        Coins.Value -= value;
+        property.Value -= value;
         return true;
     }
 }

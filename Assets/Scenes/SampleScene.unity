@@ -646,7 +646,7 @@ GameObject:
   - component: {fileID: 460741535}
   - component: {fileID: 460741534}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: StarAmount
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1127,6 +1127,7 @@ GameObject:
   - component: {fileID: 986856104}
   - component: {fileID: 986856103}
   - component: {fileID: 986856105}
+  - component: {fileID: 986856106}
   m_Layer: 5
   m_Name: CurrencyBackground
   m_TagString: Untagged
@@ -1219,6 +1220,20 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &986856106
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 986856101}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3566b9e875f346ec93d0b5f38acdef40, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <CoinsText>k__BackingField: {fileID: 1288972590}
+  <StarsText>k__BackingField: {fileID: 460741534}
 --- !u!1 &1288972588
 GameObject:
   m_ObjectHideFlags: 0
@@ -1231,7 +1246,7 @@ GameObject:
   - component: {fileID: 1288972591}
   - component: {fileID: 1288972590}
   m_Layer: 5
-  m_Name: 'Text (TMP) '
+  m_Name: CoinAmount
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
