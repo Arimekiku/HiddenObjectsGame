@@ -585,9 +585,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _spawnData: {fileID: 11400000, guid: 0e5cc82b88900044aa8b4a6291d0b287, type: 2}
-  _hiddenObjectPresenterPrefab: {fileID: 2013600403513066282, guid: 6071f98e3f1c3ce45a1247f6b81fdefc, type: 3}
-  _starPresenter: {fileID: 7225344270377765436, guid: 6ec5fce2bb710f94aa9cdbf3210025c4, type: 3}
-  _coinPresenter: {fileID: 3159570642636564932, guid: 9f04491e9aae2e642a47db4f85167c66, type: 3}
+  _presenterPrefab: {fileID: 4397662033471735793, guid: 6071f98e3f1c3ce45a1247f6b81fdefc, type: 3}
   _cameraTracker: {fileID: 676889930}
 --- !u!1 &1436427859
 GameObject:

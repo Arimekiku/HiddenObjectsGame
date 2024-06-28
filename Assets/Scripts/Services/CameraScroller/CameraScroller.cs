@@ -1,22 +1,26 @@
 ﻿using UniRx;
-using UniRx.Triggers;
 using UnityEngine;
 using Zenject;
 
-public class CameraScroller : MonoBehaviour
+public class CameraScroller : IInitializable
 {
-    [Inject] private CameraTracker _cameraTracker;
-
-    private Vector2 _worldPointOnStartScroll;
+    private readonly CameraTracker _cameraTracker;
     
-    private void Awake()
+    private Vector2 _worldPointOnStartScroll;
+
+    public CameraScroller(CameraTracker tracker)
     {
-        this.UpdateAsObservable()
+        _cameraTracker = tracker;
+    }
+    
+    public void Initialize()
+    {
+        Observable.EveryUpdate()
             .Where(_ => Input.touchCount != 0)
             .Select(_ => Input.GetTouch(0))
             .Subscribe(ScrollCamera);
     }
-
+    
     private void ScrollCamera(Touch touch)
     {
         if (touch.phase == TouchPhase.Began)

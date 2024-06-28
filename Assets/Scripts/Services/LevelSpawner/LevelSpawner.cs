@@ -15,19 +15,15 @@ public class LevelSpawner : IDisposable
     private const string STAR_DATA_PATH = "SO/StarData";
     
     private readonly SpawnData _spawnData;
-    private readonly HiddenObjectFactory _factory;
-    private readonly StarFactory _starFactory;
-    private readonly CoinFactory _coinFactory;
+    private readonly CollectableFactory _factory;
     private readonly List<CollectableData> _datas;
     private readonly CoinData _coinData;
     private readonly StarData _starData;
 
-    private LevelSpawner(SpawnData spawnData, HiddenObjectFactory factory, StarFactory starFactory, CoinFactory coinFactory)
+    private LevelSpawner(SpawnData spawnData, CollectableFactory factory)
     {
         _spawnData = spawnData;
         _factory = factory;
-        _starFactory = starFactory;
-        _coinFactory = coinFactory;
         
         _datas = new List<CollectableData>
         {
@@ -49,45 +45,38 @@ public class LevelSpawner : IDisposable
 
     public void SpawnAndPlaceHiddenObject(Bounds levelBounds)
     {
-        Vector2 randomPoint = GetRandomPointInCollider(levelBounds);
+        ICollectableModel newModel = new CollectableModel(_datas[Random.Range(0, _datas.Count)]);
+        CollectablePresenter instance = _factory.Create(newModel);
 
-        CollectableData randomData = _datas[Random.Range(0, _datas.Count)];
-        HiddenObjectPresenter instance = _factory.Create(randomData);
-        instance.transform.position = randomPoint;
-
-        float randomMultiplier = Random.Range(0.5f, _spawnData.MaxInstanceScale);
-        instance.transform.localScale *= randomMultiplier;
-
-        float randomRotation = Random.Range(0f, 360);
-        instance.transform.rotation = Quaternion.Euler(0, 0, randomRotation);
+        PlaceEntity(instance, levelBounds);
     }
     
     public void SpawnAndPlaceCoin(Bounds levelBounds)
     {
-        Vector2 randomPoint = GetRandomPointInCollider(levelBounds);
-
-        CoinPresenter instance = _coinFactory.Create(_coinData);
-        instance.transform.position = randomPoint;
-
-        float randomMultiplier = Random.Range(0.5f, _spawnData.MaxInstanceScale);
-        instance.transform.localScale *= randomMultiplier;
-
-        float randomRotation = Random.Range(0f, 360);
-        instance.transform.rotation = Quaternion.Euler(0, 0, randomRotation);
+        ICollectableModel newModel = new CollectableModel(_coinData);
+        CollectablePresenter instance = _factory.Create(newModel);
+        
+        PlaceEntity(instance, levelBounds);
     }
     
     public void SpawnAndPlaceStar(Bounds levelBounds)
     {
-        Vector2 randomPoint = GetRandomPointInCollider(levelBounds);
+        ICollectableModel newModel = new CollectableModel(_starData);
+        CollectablePresenter instance = _factory.Create(newModel);
+        
+        PlaceEntity(instance, levelBounds);
+    }
 
-        StarPresenter instance = _starFactory.Create(_starData);
-        instance.transform.position = randomPoint;
+    private void PlaceEntity(CollectablePresenter entity, Bounds levelBounds)
+    {
+        Vector2 randomPoint = GetRandomPointInCollider(levelBounds);
+        entity.transform.position = randomPoint;
 
         float randomMultiplier = Random.Range(0.5f, _spawnData.MaxInstanceScale);
-        instance.transform.localScale *= randomMultiplier;
+        entity.transform.localScale *= randomMultiplier;
 
         float randomRotation = Random.Range(0f, 360);
-        instance.transform.rotation = Quaternion.Euler(0, 0, randomRotation);
+        entity.transform.rotation = Quaternion.Euler(0, 0, randomRotation);
     }
     
     private Vector2 GetRandomPointInCollider(Bounds mapBounds)
