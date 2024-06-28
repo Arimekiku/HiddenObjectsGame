@@ -1,1 +1,4 @@
-﻿public interface ICollectablePresenter { }
+﻿public interface ICollectablePresenter
+{
+    public void Collect();
+}

@@ -23,7 +23,7 @@ public class LevelInstaller : MonoInstaller<LevelInstaller>
 
     private void BindServices()
     {
-        Container.BindInterfacesAndSelfTo<CameraScroller>().AsSingle().WithArguments(_cameraTracker);
+        Container.BindInterfacesAndSelfTo<TapHandler>().AsSingle().WithArguments(_cameraTracker);
         Container.BindInterfacesAndSelfTo<LevelSpawner>().AsSingle();
         Container.BindInterfacesAndSelfTo<WalletService>().AsSingle();
         Container.BindInterfacesAndSelfTo<FactoryService>().AsSingle();

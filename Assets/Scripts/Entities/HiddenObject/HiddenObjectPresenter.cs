@@ -19,6 +19,11 @@ public class HiddenObjectPresenter : MonoBehaviour, ICollectablePresenter
     {
         _model.IsCollected.Subscribe(HandleDeath);
     }
+    
+    public void Collect()
+    {
+        _model.Collect();
+    }
 
     private void HandleDeath(bool value)
     {
@@ -27,10 +32,4 @@ public class HiddenObjectPresenter : MonoBehaviour, ICollectablePresenter
         
         DestroyImmediate(gameObject);
     }
-
-    private void OnMouseDown()
-    {
-        _model.Collect();
-    }
-
 }

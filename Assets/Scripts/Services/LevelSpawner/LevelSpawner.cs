@@ -2,7 +2,7 @@
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class LevelSpawner
+public class LevelSpawner : ILevelSpawner
 {
     private readonly SpawnData _spawnData;
     private readonly IFactoryService _factory;

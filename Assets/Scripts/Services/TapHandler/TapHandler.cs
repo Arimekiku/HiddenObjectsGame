@@ -2,23 +2,25 @@
 using UnityEngine;
 using Zenject;
 
-public class CameraScroller : IInitializable
+public class TapHandler : IInitializable
 {
     private readonly CameraTracker _cameraTracker;
     
     private Vector2 _worldPointOnStartScroll;
 
-    public CameraScroller(CameraTracker tracker)
+    public TapHandler(CameraTracker tracker)
     {
         _cameraTracker = tracker;
     }
 
     public void Initialize()
     {
-        Observable.EveryUpdate()
+        var touchStream = Observable.EveryUpdate()
             .Where(_ => Input.touchCount != 0)
-            .Select(_ => Input.GetTouch(0))
-            .Subscribe(ScrollCamera);
+            .Select(_ => Input.GetTouch(0));
+
+        touchStream.Subscribe(ScrollCamera);
+        touchStream.Subscribe(CheckOnCollectable);
     }
     
     private void ScrollCamera(Touch touch)
@@ -33,5 +35,16 @@ public class CameraScroller : IInitializable
         Vector3 direction = _worldPointOnStartScroll - touchMove;
 
         _cameraTracker.transform.position += direction;
+    }
+
+    private void CheckOnCollectable(Touch touch)
+    {
+        Vector2 worldPosition = Camera.main.ScreenToWorldPoint(touch.position);
+        RaycastHit2D raycastHit2D = Physics2D.Raycast(worldPosition, Vector2.zero);
+        
+        if (!raycastHit2D.collider.TryGetComponent(out ICollectablePresenter collectable)) 
+            return;
+        
+        collectable.Collect();
     }
 }
