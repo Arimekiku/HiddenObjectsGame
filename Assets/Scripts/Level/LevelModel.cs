@@ -4,16 +4,15 @@ using Zenject;
 public class LevelModel
 {
     [Inject] private SpawnData _data;
-    [Inject] private CameraScroller _cameraScroller;
-    [Inject] private LevelSpawner _levelSpawner;
+    [Inject] private ILevelSpawner _levelSpawner;
 
     public void SpawnEntitiesInBounds(Bounds mapBounds)
     {
         for (int i = 0; i < _data.SpawnNumber; i++)
         {
-            _levelSpawner.SpawnAndPlaceHiddenObject(mapBounds);
-            _levelSpawner.SpawnAndPlaceCoin(mapBounds);
-            _levelSpawner.SpawnAndPlaceStar(mapBounds);
+            _levelSpawner.SpawnAndPlaceEntity<HiddenObjectPresenter>(mapBounds);
+            _levelSpawner.SpawnAndPlaceEntity<CoinPresenter>(mapBounds);
+            _levelSpawner.SpawnAndPlaceEntity<StarPresenter>(mapBounds);
         }
     }
 }

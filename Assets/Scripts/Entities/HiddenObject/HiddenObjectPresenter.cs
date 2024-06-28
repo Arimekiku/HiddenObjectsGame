@@ -2,15 +2,17 @@
 using UnityEngine;
 using Zenject;
 
-public class CollectablePresenter : MonoBehaviour
+public class HiddenObjectPresenter : MonoBehaviour, ICollectablePresenter
 {
     [SerializeField] private SpriteRenderer _renderer;
+    [SerializeField] private HiddenObjectData _data;
     
     [Inject] private ICollectableModel _model;
-
+    
     private void Awake()
     {
-        _renderer.sprite = _model.Data.Sprite;
+        Sprite randomSprite = _data.Sprites[Random.Range(0, _data.Sprites.Length)];
+        _renderer.sprite = randomSprite;
     }
     
     private void Start()
@@ -30,6 +32,5 @@ public class CollectablePresenter : MonoBehaviour
     {
         _model.Collect();
     }
-}
 
-public class CollectableFactory : PlaceholderFactory<ICollectableModel, CollectablePresenter> { }
+}

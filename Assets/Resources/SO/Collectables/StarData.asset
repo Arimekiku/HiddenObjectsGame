@@ -9,8 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c0d10b4693594c02b73a6f3e1aa27d2d, type: 3}
-  m_Name: Steerwheel
+  m_Script: {fileID: 11500000, guid: e7f396c63aa54ce089f7066ea9d943c1, type: 3}
+  m_Name: StarData
   m_EditorClassIdentifier: 
-  <DataId>k__BackingField: 4
-  <Sprite>k__BackingField: {fileID: -1903644779, guid: 9a8ab113dc81de04d95c2c1ef86d5126, type: 3}
+  <DataId>k__BackingField: 3
+  <StarAmount>k__BackingField: 2

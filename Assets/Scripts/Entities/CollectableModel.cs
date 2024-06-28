@@ -2,14 +2,10 @@
 
 public class CollectableModel : ICollectableModel
 {
-    public CollectableData Data { get; }
-    
     public BoolReactiveProperty IsCollected { get; }
 
-    public CollectableModel(CollectableData data)
+    public CollectableModel()
     {
-        Data = data;
-        
         IsCollected = new BoolReactiveProperty(false);
     }
 

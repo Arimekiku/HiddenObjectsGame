@@ -12,7 +12,7 @@ public class CameraScroller : IInitializable
     {
         _cameraTracker = tracker;
     }
-    
+
     public void Initialize()
     {
         Observable.EveryUpdate()

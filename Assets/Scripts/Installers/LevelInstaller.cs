@@ -5,9 +5,6 @@ public class LevelInstaller : MonoInstaller<LevelInstaller>
 {
     [Header("Configs")]
     [SerializeField] private SpawnData _spawnData;
-    
-    [Header("Presenters")]
-    [SerializeField] private CollectablePresenter _presenterPrefab;
 
     [Header("Camera Tracker")] 
     [SerializeField] private CameraTracker _cameraTracker;
@@ -17,7 +14,6 @@ public class LevelInstaller : MonoInstaller<LevelInstaller>
         BindConfig();
         BindServices();
         BindLevel();
-        BindSpawner();
     }
 
     private void BindConfig()
@@ -29,17 +25,13 @@ public class LevelInstaller : MonoInstaller<LevelInstaller>
     {
         Container.BindInterfacesAndSelfTo<CameraScroller>().AsSingle().WithArguments(_cameraTracker);
         Container.BindInterfacesAndSelfTo<LevelSpawner>().AsSingle();
+        Container.BindInterfacesAndSelfTo<WalletService>().AsSingle();
+        Container.BindInterfacesAndSelfTo<FactoryService>().AsSingle();
     }
 
     private void BindLevel()
     {
+        Container.BindInterfacesAndSelfTo<CollectableModel>().AsTransient();
         Container.Bind<LevelModel>().AsSingle();
-    }
-    
-    private void BindSpawner()
-    {
-        Container
-            .BindFactory<ICollectableModel, CollectablePresenter, CollectableFactory>()
-            .FromComponentInNewPrefab(_presenterPrefab);
     }
 }
