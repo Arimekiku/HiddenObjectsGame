@@ -6,6 +6,9 @@ public class LevelInstaller : MonoInstaller<LevelInstaller>
     [Header("Configs")]
     [SerializeField] private LevelSpawnData _levelSpawnData;
 
+    [Header("Presenters")] 
+    [SerializeField] private CurrencyPresenter _currencyPresenter;
+    
     [Header("Camera Tracker")] 
     [SerializeField] private CameraTracker _cameraTracker;
     
@@ -13,6 +16,7 @@ public class LevelInstaller : MonoInstaller<LevelInstaller>
     {
         BindConfig();
         BindServices();
+        BindPresenters();
         BindLevel();
     }
 
@@ -30,6 +34,11 @@ public class LevelInstaller : MonoInstaller<LevelInstaller>
         Container.BindInterfacesAndSelfTo<FactoryService>().AsSingle();
     }
 
+    private void BindPresenters()
+    {
+        Container.BindInstance(_currencyPresenter);    
+    }
+    
     private void BindLevel()
     {
         Container.BindInterfacesAndSelfTo<CollectableModel>().AsTransient();

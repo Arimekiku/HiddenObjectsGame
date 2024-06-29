@@ -135,7 +135,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 0.2627451, g: 0.96862745, b: 0.60784316, a: 1}
-  m_RaycastTarget: 0
+  m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -289,7 +289,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 0.392}
-  m_RaycastTarget: 0
+  m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -526,7 +526,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 0.2627451, g: 0.96862745, b: 0.60784316, a: 1}
-  m_RaycastTarget: 0
+  m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -687,6 +687,7 @@ GameObject:
   - component: {fileID: 4767907114728620192}
   - component: {fileID: 2275329524943301559}
   - component: {fileID: 5410822893618098947}
+  - component: {fileID: 9168984614636520658}
   m_Layer: 5
   m_Name: StarBackground
   m_TagString: Untagged
@@ -737,7 +738,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 0.2627451, g: 0.96862745, b: 0.60784316, a: 1}
-  m_RaycastTarget: 0
+  m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -753,6 +754,21 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &9168984614636520658
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3749672068965204265}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cdb4639f4be84818be48b93577ae7a47, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _countText: {fileID: 3975020782363480594}
+  _type: 6
+  _image: {fileID: 7863828005070628892}
 --- !u!1 &4188703403534497043
 GameObject:
   m_ObjectHideFlags: 0
@@ -1308,7 +1324,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 0.392}
-  m_RaycastTarget: 0
+  m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -1362,8 +1378,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3566b9e875f346ec93d0b5f38acdef40, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CoinsText: {fileID: 7794637467234451926}
-  StarsText: {fileID: 3975020782363480594}
+  CoinsHolder: {fileID: 0}
+  StarsHolder: {fileID: 0}
 --- !u!1 &8142610390091369336
 GameObject:
   m_ObjectHideFlags: 0
@@ -1643,6 +1659,7 @@ GameObject:
   - component: {fileID: 7921358888142803511}
   - component: {fileID: 7438030406773654161}
   - component: {fileID: 4590002245237438546}
+  - component: {fileID: 6059857051495091247}
   m_Layer: 5
   m_Name: CoinBackground
   m_TagString: Untagged
@@ -1693,7 +1710,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 0.2627451, g: 0.96862745, b: 0.6090433, a: 1}
-  m_RaycastTarget: 0
+  m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -1709,6 +1726,21 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &6059857051495091247
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8742195547208580500}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cdb4639f4be84818be48b93577ae7a47, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _countText: {fileID: 7794637467234451926}
+  _type: 5
+  _image: {fileID: 7594815940266220892}
 --- !u!1 &9182013592784907933
 GameObject:
   m_ObjectHideFlags: 0

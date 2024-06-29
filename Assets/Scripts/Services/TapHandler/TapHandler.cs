@@ -27,11 +27,11 @@ public class TapHandler : IInitializable
     {
         if (touch.phase == TouchPhase.Began)
         {
-            _worldPointOnStartScroll = Camera.main.ScreenToWorldPoint(touch.position);
+            _worldPointOnStartScroll = _cameraTracker.MainCamera.ScreenToWorldPoint(touch.position);
             return;
         }
 
-        Vector2 touchMove = Camera.main.ScreenToWorldPoint(touch.position);
+        Vector2 touchMove = _cameraTracker.MainCamera.ScreenToWorldPoint(touch.position);
         Vector3 direction = _worldPointOnStartScroll - touchMove;
 
         _cameraTracker.transform.position += direction;
@@ -39,7 +39,7 @@ public class TapHandler : IInitializable
 
     private void CheckOnCollectable(Touch touch)
     {
-        Vector2 worldPosition = Camera.main.ScreenToWorldPoint(touch.position);
+        Vector2 worldPosition = _cameraTracker.MainCamera.ScreenToWorldPoint(touch.position);
         RaycastHit2D raycastHit2D = Physics2D.Raycast(worldPosition, Vector2.zero);
         
         if (!raycastHit2D.collider.TryGetComponent(out ICollectablePresenter collectable)) 

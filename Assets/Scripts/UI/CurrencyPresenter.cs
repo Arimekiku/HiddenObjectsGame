@@ -1,17 +1,17 @@
-﻿using TMPro;
-using UnityEngine;
-using Zenject;
+﻿using UnityEngine;
 
 public class CurrencyPresenter : MonoBehaviour
 {
-    [SerializeField] private TextMeshProUGUI CoinsText;
-    [SerializeField] private TextMeshProUGUI StarsText;
+    [SerializeField] private CollectableUIHolder CoinsHolder;
+    [SerializeField] private CollectableUIHolder StarsHolder;
     
-    [Inject] private IWalletService _walletService;
-
-    private void Awake()
+    public void UpdateCoinsAnimation(int count)
     {
-        _walletService.Coins.SubscribeToText(CoinsText);
-        _walletService.Stars.SubscribeToText(StarsText);
+        CoinsHolder.UpdateCount(count);
+    }
+
+    public void UpdateStarsAnimation(int count)
+    {
+        StarsHolder.UpdateCount(count);
     }
 }
