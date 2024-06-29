@@ -1,6 +1,7 @@
-﻿using UnityEngine;
+﻿using System.Threading.Tasks;
+using UnityEngine;
 
 public interface ILevelSpawner
 {
-    public T SpawnAndPlaceEntity<T>(Bounds levelBounds) where T : MonoBehaviour, ICollectablePresenter;
+    public Task<CollectablePresenter> SpawnAndPlaceEntity(Bounds levelBounds, CollectableType type);
 }

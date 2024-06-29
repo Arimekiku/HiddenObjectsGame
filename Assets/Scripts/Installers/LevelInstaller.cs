@@ -7,6 +7,7 @@ public class LevelInstaller : MonoInstaller<LevelInstaller>
     [SerializeField] private LevelSpawnData _levelSpawnData;
 
     [Header("Presenters")] 
+    [SerializeField] private CollectablePresenter _collectablePresenterPrefab;
     [SerializeField] private CurrencyPresenter _currencyPresenter;
     
     [Header("Camera Tracker")] 
@@ -18,6 +19,7 @@ public class LevelInstaller : MonoInstaller<LevelInstaller>
         BindServices();
         BindPresenters();
         BindLevel();
+        BindHiddenObjects();
     }
 
     private void BindConfig()
@@ -31,7 +33,6 @@ public class LevelInstaller : MonoInstaller<LevelInstaller>
         Container.BindInterfacesAndSelfTo<TapHandler>().AsSingle().WithArguments(_cameraTracker);
         Container.BindInterfacesAndSelfTo<LevelSpawner>().AsSingle();
         Container.BindInterfacesAndSelfTo<WalletService>().AsSingle();
-        Container.BindInterfacesAndSelfTo<FactoryService>().AsSingle();
     }
 
     private void BindPresenters()
@@ -41,7 +42,18 @@ public class LevelInstaller : MonoInstaller<LevelInstaller>
     
     private void BindLevel()
     {
-        Container.BindInterfacesAndSelfTo<CollectableModel>().AsTransient();
         Container.Bind<LevelModel>().AsSingle();
+    }
+
+    private void BindHiddenObjects()
+    {
+        Container.BindInterfacesAndSelfTo<CollectableModel>().AsTransient();
+        Container
+            .BindFactory<Sprite, CollectableType, CollectablePresenter, CollectableFactory>()
+            .FromMonoPoolableMemoryPool(
+                p 
+                    => p.WithInitialSize((int)(_levelSpawnData.MaxSpawnNumber * 3 + _levelSpawnData.ObjectProducersNumber))
+                .FromComponentInNewPrefab(_collectablePresenterPrefab)
+                .UnderTransformGroup("Collectables"));
     }
 }

@@ -11,14 +11,10 @@ public class CollectableUISpawner : MonoBehaviour
     [Inject] private CurrencyPresenter _currencyPresenter;
     [Inject] private IWalletService _walletService;
 
-    private void Awake()
-    {
-        TestCollectAnimation();
-    }
-
-    private void TestCollectAnimation()
+    private void TestCollectAnimation(Vector2 startPosition)
     {
         CollectableUIPresenter instance = Instantiate(_collectableUIPrefab, _parent.transform);
+        instance.transform.position = startPosition;
 
         instance.transform
             .DOMove(_holder.transform.position, 0.5f)

@@ -200,7 +200,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 18, y: 18}
+  m_Size: {x: 15, y: 15}
   m_EdgeRadius: 0
 --- !u!114 &368362352
 MonoBehaviour:
@@ -303,6 +303,17 @@ Transform:
   - {fileID: 1436427860}
   m_Father: {fileID: 814628131}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &486508501 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8679601605634624783, guid: 35947aeb1ef9b8140978984a97f2665f, type: 3}
+  m_PrefabInstance: {fileID: 7013018330279852603}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3566b9e875f346ec93d0b5f38acdef40, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -700,6 +711,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _levelSpawnData: {fileID: 11400000, guid: 0e5cc82b88900044aa8b4a6291d0b287, type: 2}
+  _collectablePresenterPrefab: {fileID: 839253528119152115, guid: d142f1f0600f91e4790fd0b671309824, type: 3}
+  _currencyPresenter: {fileID: 486508501}
   _cameraTracker: {fileID: 676889930}
 --- !u!114 &1389723062 stripped
 MonoBehaviour:

@@ -1,48 +1,46 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using Zenject;
+using Random = UnityEngine.Random;
 
 public class LevelModel
 {
     [Inject] private LevelSpawnData _data;
     [Inject] private ILevelSpawner _levelSpawner;
 
-    private readonly List<HiddenObjectPresenter> _hiddenObjects;
-    private readonly List<CoinPresenter> _coins;
-    private readonly List<StarPresenter> _stars;
+    private readonly CollectableType[] _hiddenObjectTypes;
+    private readonly List<CollectablePresenter> _collectables;
 
     public LevelModel()
     {
-        _coins = new List<CoinPresenter>();
-        _stars = new List<StarPresenter>();
-        _hiddenObjects = new List<HiddenObjectPresenter>();
+        _collectables = new List<CollectablePresenter>();
+        
+        _hiddenObjectTypes = new CollectableType[]
+        {
+            CollectableType.Hammer,
+            CollectableType.Steerwheel,
+            CollectableType.Salt,
+            CollectableType.Joystick,
+            CollectableType.Kettle,
+        };
     }
     
-    public void SpawnEntitiesInBounds(Bounds mapBounds)
+    public async void SpawnEntitiesInBounds(Bounds mapBounds)
     {
         for (int i = 0; i < _data.MaxSpawnNumber; i++)
         {
-            HiddenObjectPresenter hiddenObject = _levelSpawner.SpawnAndPlaceEntity<HiddenObjectPresenter>(mapBounds);
-            _hiddenObjects.Add(hiddenObject);
+            CollectableType hiddenObjectType = _hiddenObjectTypes[Random.Range(0, _hiddenObjectTypes.Length)];
+            CollectablePresenter hiddenObject = await _levelSpawner.SpawnAndPlaceEntity(mapBounds, hiddenObjectType);
             
-            CoinPresenter coin = _levelSpawner.SpawnAndPlaceEntity<CoinPresenter>(mapBounds);
-            _coins.Add(coin);
+            CollectablePresenter coin = await _levelSpawner.SpawnAndPlaceEntity(mapBounds, CollectableType.Coin);
+            CollectablePresenter star = await _levelSpawner.SpawnAndPlaceEntity(mapBounds, CollectableType.Star);
+
+            if (i >= _data.InitialSpawnNumber) 
+                continue;
             
-            StarPresenter star = _levelSpawner.SpawnAndPlaceEntity<StarPresenter>(mapBounds);
-            _stars.Add(star);
+            hiddenObject.gameObject.SetActive(true);
+            coin.gameObject.SetActive(true);
+            star.gameObject.SetActive(true);
         }
-
-        for (uint i = _data.MaxSpawnNumber; i >= _data.InitialSpawnNumber; i--)
-        {
-            DisableEntity(_hiddenObjects.First(o => o.gameObject.activeSelf).gameObject);
-            DisableEntity(_coins.First(c => c.gameObject.activeSelf).gameObject);
-            DisableEntity(_stars.First(s => s.gameObject.activeSelf).gameObject);
-        }
-    }
-
-    private void DisableEntity(GameObject entity)
-    {
-        entity.gameObject.SetActive(false);
     }
 }
