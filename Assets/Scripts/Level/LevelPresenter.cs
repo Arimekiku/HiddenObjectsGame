@@ -4,17 +4,14 @@ using Zenject;
 
 public class LevelPresenter : MonoBehaviour
 {
-    [SerializeField] private BoxCollider2D _mapBounds;
-    
     [Inject] private LevelCurrencyData _currencyData;
     [Inject] private LevelModel _model;
     [Inject] private CounterProvider _uiSpawner;
-    [Inject] private ILevelSwapper _levelSwapper;
     [Inject] private SaveProvider _saveProvider;
 
     private void Awake()
     {
-        _model.SetupLevel(_mapBounds.bounds);
+        _model.SetupLevel(transform);
         
         _model.OnCollectableClicked.Subscribe(OnCollectableClicked);
     }
@@ -32,12 +29,6 @@ public class LevelPresenter : MonoBehaviour
         if (collectable.Model.Type == CollectableType.Star)
         {
             _uiSpawner.CollectAnimation(collectable, _currencyData.StarAmount);
-            return;
-        }
-        
-        if (_model.IsCompleted)
-        {
-            _levelSwapper.LoadNextLevel();
             return;
         }
         

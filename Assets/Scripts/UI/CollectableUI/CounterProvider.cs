@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using DG.Tweening;
 using UnityEngine;
 using Zenject;
@@ -12,6 +11,7 @@ public class CounterProvider : MonoBehaviour
     [Inject] private CollectableUIFactory _uiFactory;
     [Inject] private CameraTracker _tracker;
     [Inject] private SaveProvider _saveProvider;
+    [Inject] private CameraTracker _cameraTracker;
 
     private void Awake()
     {
@@ -33,7 +33,7 @@ public class CounterProvider : MonoBehaviour
     {
         CollectableUIPresenter instance = _uiFactory.Create(presenter.Model);
         instance.transform.SetParent(_parent.transform, false);
-        instance.transform.position = presenter.transform.position;
+        instance.transform.position = _cameraTracker.MainCamera.WorldToScreenPoint(presenter.transform.position);
 
         CollectableUICounter counterUI = _holders.First(h => h.Counter.Type == presenter.Model.Type);
         

@@ -4,14 +4,9 @@ using Zenject;
 
 public class TapHandler : IInitializable
 {
-    private readonly CameraTracker _cameraTracker;
+    [Inject] private CameraTracker _cameraTracker;
     
     private Vector2 _worldPointOnStartScroll;
-
-    public TapHandler(CameraTracker tracker)
-    {
-        _cameraTracker = tracker;
-    }
 
     public void Initialize()
     {
@@ -34,13 +29,19 @@ public class TapHandler : IInitializable
         Vector2 touchMove = _cameraTracker.MainCamera.ScreenToWorldPoint(touch.position);
         Vector3 direction = _worldPointOnStartScroll - touchMove;
 
-        _cameraTracker.transform.position += direction;
+        _cameraTracker.MainCamera.transform.position += direction;
     }
 
     private void CheckOnCollectable(Touch touch)
     {
+        if (touch.phase != TouchPhase.Began)
+            return;
+        
         Vector2 worldPosition = _cameraTracker.MainCamera.ScreenToWorldPoint(touch.position);
         RaycastHit2D raycastHit2D = Physics2D.Raycast(worldPosition, Vector2.zero);
+        
+        if (raycastHit2D.collider == null)
+            return;
         
         if (raycastHit2D.collider.TryGetComponent(out CollectablePresenter collectable))
             collectable.Model.Collect();

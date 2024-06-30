@@ -6,15 +6,13 @@ public class LevelInstaller : MonoInstaller<LevelInstaller>
     [Header("Configs")]
     [SerializeField] private LevelSpawnData _levelSpawnData;
     [SerializeField] private LevelCurrencyData _currencyData;
+    [SerializeField] private ProducerData _producerData;
 
     [Header("Presenters")] 
     [SerializeField] private CollectablePresenter _collectablePresenterPrefab;
     [SerializeField] private CollectableUIPresenter _uiPresenterPrefab;
     [SerializeField] private ProducerPresenter _producerPresenterPrefab;
     [SerializeField] private CounterProvider _counterContainer;
-    
-    [Header("Camera Tracker")] 
-    [SerializeField] private CameraTracker _cameraTracker;
     
     public override void InstallBindings()
     {
@@ -38,11 +36,12 @@ public class LevelInstaller : MonoInstaller<LevelInstaller>
     {
         Container.BindInstance(_levelSpawnData);
         Container.BindInstance(_currencyData);
+        Container.BindInstance(_producerData);
     }
 
     private void BindServices()
     {
-        Container.Bind<CameraTracker>().FromInstance(_cameraTracker);
+        Container.BindInterfacesAndSelfTo<CameraTracker>().AsSingle();
         Container.BindInterfacesAndSelfTo<SpriteProvider>().AsSingle();
         Container.BindInterfacesAndSelfTo<TapHandler>().AsSingle();
         Container.BindInterfacesAndSelfTo<LevelSpawner>().AsSingle();

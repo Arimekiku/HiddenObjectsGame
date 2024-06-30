@@ -27,4 +27,10 @@ public class LevelSaveData
         
         saveData.Count = newData;
     }
+
+    public void UpdateProducer(ProducerPresenter producer)
+    {
+        ProducerSaveData saveData = ProducersData.First(p => p.Id == producer.Id);
+        saveData.IsCollected = producer.Model.IsCollected.Value;
+    }
 }

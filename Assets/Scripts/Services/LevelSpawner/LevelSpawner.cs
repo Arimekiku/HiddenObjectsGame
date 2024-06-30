@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -24,12 +23,12 @@ public class LevelSpawner : ILevelSpawner
         CollectableTypeToSprite = new Dictionary<CollectableType, Sprite> { { CollectableType.Empty, null } };
     }
 
-    public CollectablePresenter SpawnAndPlaceCollectable(Bounds levelBounds, CollectableType type)
+    public CollectablePresenter SpawnAndPlaceCollectable(uint radius, Transform center, CollectableType type)
     {
         CollectablePresenter instance = _collectableFactory.Create();
         instance.Initialize(type);
 
-        Vector2 randomPoint = GetRandomPointInCollider(levelBounds);
+        Vector2 randomPoint = GetRandomPointInCircle(radius, center);
         instance.transform.position = randomPoint;
 
         float randomMultiplier = Random.Range(0.5f, _levelSpawnData.MaxInstanceScale);
@@ -55,12 +54,12 @@ public class LevelSpawner : ILevelSpawner
         return instance;
     }
 
-    public ProducerPresenter SpawnAndPlaceProducer(Bounds levelBounds, bool isCollected)
+    public ProducerPresenter SpawnAndPlaceProducer(uint radius, Transform center, bool isCollected)
     {
         ProducerPresenter instance = _producerFactory.Create();
         instance.Model.Initialize(isCollected);
         
-        Vector2 randomPoint = GetRandomPointInCollider(levelBounds);
+        Vector2 randomPoint = GetRandomPointInCircle(radius, center);
         instance.transform.position = randomPoint;
 
         LoadSprite(instance);
@@ -70,6 +69,7 @@ public class LevelSpawner : ILevelSpawner
     public ProducerPresenter SpawnAndPlaceProducer(ProducerSaveData saveData)
     {
         ProducerPresenter instance = _producerFactory.Create();
+        instance.Id = saveData.Id;
         instance.Model.Initialize(saveData.IsCollected);
         
         instance.transform.position = saveData.Position;
@@ -90,22 +90,14 @@ public class LevelSpawner : ILevelSpawner
         instance.Model.UpdateSprite(sprite);
     } 
     
-    private Vector2 GetRandomPointInCollider(Bounds mapBounds)
+    private Vector2 GetRandomPointInCircle(float radius, Transform center)
     {
-        for (int i = 0; i < 200; i++)
-        {
-            float xComponent = Random.Range(mapBounds.min.x, mapBounds.max.x);
-            float yComponent = Random.Range(mapBounds.min.y, mapBounds.max.y);
-            Vector2 convertPosition = new Vector2(xComponent, yComponent);
+        float randomMultiplier = Random.Range(0, radius);
+        Vector2 randomPointOnCircle = Random.insideUnitCircle;
 
-            Collider2D[] collider = Physics2D.OverlapCircleAll(convertPosition, _levelSpawnData.MinRangeBetweenObjects);
-            if (collider.Any(c => c.TryGetComponent(out CollectablePresenter _)))
-                continue;
+        Vector3 resultPosition = randomPointOnCircle * randomMultiplier;
 
-            return convertPosition;
-        }
-
-        return Vector2.zero;
+        return resultPosition + center.position;
     }
 
     private async Task<Sprite> LoadSprite(CollectableType type)

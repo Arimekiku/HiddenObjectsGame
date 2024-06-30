@@ -4,10 +4,9 @@ using Zenject;
 
 public class ProducerPresenter : MonoBehaviour
 {
-    public Bounds SpawnBounds => _spawnBounds.bounds;
+    public int Id;
     
     [SerializeField] private SpriteRenderer _renderer;
-    [SerializeField] private BoxCollider2D _spawnBounds;
 
     [Inject] private ProducerModel _producerModel;
 

@@ -10,23 +10,23 @@ using Random = UnityEngine.Random;
 public class LevelModel
 {
     [Inject] private LevelSpawnData _data;
+    [Inject] private ProducerData _producerData;
     [Inject] private ILevelSpawner _levelSpawner;
+    [Inject] private ILevelSwapper _levelSwapper;
     [Inject] private SaveProvider _saveProvider;
 
     public readonly ReactiveCommand<CollectablePresenter> OnCollectableClicked;
 
-    public bool IsCompleted => _hiddenObjects.IsEmpty();
-    
     private readonly CollectableType[] _hiddenObjectTypes;
     private readonly List<CollectablePresenter> _hiddenObjects;
-    private readonly List<ProducerPresenter> _producers;
+
+    private Transform levelCenter;
     
     public LevelModel()
     {
         OnCollectableClicked = new ReactiveCommand<CollectablePresenter>();
 
         _hiddenObjects = new List<CollectablePresenter>();
-        _producers = new List<ProducerPresenter>();
         
         _hiddenObjectTypes = new CollectableType[]
         {
@@ -38,26 +38,26 @@ public class LevelModel
         };
     }
 
-    public void SetupLevel(Bounds mapBounds)
+    public void SetupLevel(Transform center)
     {
-        SpawnHiddenObjects(mapBounds);
+        levelCenter = center;
+        
+        SpawnHiddenObjects();
 
-        SpawnCoinsAndStars(mapBounds);
+        SpawnCoinsAndStars();
     }
 
-    private void SpawnHiddenObjects(Bounds mapBounds)
+    private void SpawnHiddenObjects()
     {
         if (!_saveProvider.SaveData.EntitiesData.IsEmpty())
         {
             foreach (HiddenObjectSaveData entityData in _saveProvider.SaveData.EntitiesData)
-                _hiddenObjects.Add(CreateNextInstance(mapBounds, entityData));
+                _hiddenObjects.Add(CreateNextInstance(entityData));
 
             foreach (ProducerSaveData producerData in _saveProvider.SaveData.ProducersData)
             {
                 ProducerPresenter producer = _levelSpawner.SpawnAndPlaceProducer(producerData);
                 producer.Model.OnCollect.Subscribe(_ => OnProducerCollect(producer));
-
-                _producers.Add(producer);
             }
             
             return;
@@ -65,79 +65,96 @@ public class LevelModel
 
         for (int i = 0; i < _data.ObjectProducersNumber; i++)
         {
-            ProducerPresenter producer = _levelSpawner.SpawnAndPlaceProducer(mapBounds, false);
+            ProducerPresenter producer = _levelSpawner.SpawnAndPlaceProducer(_data.MaxSpawnRadius, levelCenter, false);
+            producer.Id = i;
             SaveProducer(producer);
 
             producer.Model.OnCollect.Subscribe(_ => OnProducerCollect(producer));
-            _producers.Add(producer);
         }
         
         for (int i = 0; i < _data.InitialSpawnNumber; i++)
-            _hiddenObjects.Add(CreateNextInstance(mapBounds, _hiddenObjectTypes));
+            _hiddenObjects.Add(CreateNextInstance(_hiddenObjectTypes));
     }
 
-    private void SpawnCoinsAndStars(Bounds mapBounds)
+    private void SpawnCoinsAndStars()
     {
         for (int i = 0; i < _data.InitialSpawnNumber; i++)
         {
-            CreateNextInstance(mapBounds, CollectableType.Coin);
+            CreateNextInstance(CollectableType.Coin);
 
-            CreateNextInstance(mapBounds, CollectableType.Star);
+            CreateNextInstance(CollectableType.Star);
         }
     }
 
-    private CollectablePresenter CreateNextInstance(Bounds bounds, params CollectableType[] types)
+    private CollectablePresenter CreateNextInstance(params CollectableType[] types)
     {
         CollectableType selectedType = types[Random.Range(0, types.Length)];
-        CollectablePresenter instance = _levelSpawner.SpawnAndPlaceCollectable(bounds, selectedType);
+        CollectablePresenter instance = _levelSpawner.SpawnAndPlaceCollectable(_data.MaxSpawnRadius, levelCenter, selectedType);
         
         if (!types.Contains(CollectableType.Star) && !types.Contains(CollectableType.Coin))
             SaveEntity(instance);
         
         instance.Model.OnCollect.Subscribe(_ =>
         {
-            OnCollectableCollect(bounds, instance);
+            OnCollectableCollect(instance);
         });
 
         return instance;
     }
 
-    private CollectablePresenter CreateNextInstance(Bounds bounds, HiddenObjectSaveData hiddenObjectData)
+    private CollectablePresenter CreateNextInstance(HiddenObjectSaveData hiddenObjectData)
     {
         CollectablePresenter instance = _levelSpawner.SpawnAndPlaceCollectable(hiddenObjectData);
         instance.Model.OnCollect.Subscribe(_ =>
         {
-            OnCollectableCollect(bounds, instance);
+            OnCollectableCollect(instance);
         });
 
         return instance;
     }
 
-    private void OnCollectableCollect(Bounds bounds, CollectablePresenter collectable)
+    private void OnCollectableCollect(CollectablePresenter collectable)
     {
         OnCollectableClicked.Execute(collectable);
+
+        if (_hiddenObjects.Contains(collectable))
+        {
+            _hiddenObjects.Remove(collectable);
+            
+            if (_hiddenObjects.IsEmpty())
+                _levelSwapper.LoadNextLevel();
+        }
             
         Observable.Timer(TimeSpan.FromSeconds(10f)).Subscribe(_ =>
         {
             if (collectable.Model.Type == CollectableType.Star)
             {
-                CreateNextInstance(bounds, CollectableType.Star);
+                CreateNextInstance(CollectableType.Star);
                 return;
             }
 
             if (collectable.Model.Type == CollectableType.Coin)
             {
-                CreateNextInstance(bounds, CollectableType.Coin);
+                CreateNextInstance(CollectableType.Coin);
                 return;
             }
             
-            _hiddenObjects.Add(CreateNextInstance(bounds, _hiddenObjectTypes));
+            _hiddenObjects.Add(CreateNextInstance(_hiddenObjectTypes));
         });
     }
 
     private void OnProducerCollect(ProducerPresenter producer)
     {
-        CreateNextInstance(producer.SpawnBounds, _hiddenObjectTypes);
+        _saveProvider.SaveData.UpdateProducer(producer);
+        _saveProvider.Save();
+        
+        CollectableType selectedType = _hiddenObjectTypes[Random.Range(0, _hiddenObjectTypes.Length)];
+        CollectablePresenter instance = _levelSpawner.SpawnAndPlaceCollectable(_producerData.SpawnRadius, producer.transform, selectedType);
+        
+        instance.Model.OnCollect.Subscribe(_ =>
+        {
+            OnCollectableCollect(instance);
+        });
     }
 
     private void SaveEntity(CollectablePresenter entity)
@@ -158,7 +175,7 @@ public class LevelModel
     private void SaveProducer(ProducerPresenter producer)
     {
         ProducerSaveData producerSaveData =
-            new ProducerSaveData(producer.transform.localToWorldMatrix, producer.Model.IsCollected.Value);
+            new ProducerSaveData(producer.transform.localToWorldMatrix, producer.Model.IsCollected.Value, producer.Id);
         _saveProvider.SaveData.ProducersData.Add(producerSaveData);
         _saveProvider.Save();
     }

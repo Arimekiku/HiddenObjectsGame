@@ -25,8 +25,8 @@ public class ProducerModel
         if (IsCollected.Value == true) 
             return;
 
-        OnCollect.Execute();
         IsCollected.Value = true;
+        OnCollect.Execute();
     }
 
     public void UpdateSprite(Sprite sprite)
