@@ -14,8 +14,8 @@ public class ProducerPresenter : MonoBehaviour
 
     private void Awake()
     {
-        _producerModel.Sprite.Subscribe(HandleSprite);
-        _producerModel.IsCollected.Subscribe(HandleOpacity);
+        _producerModel.Sprite.Subscribe(HandleSprite).AddTo(this);
+        _producerModel.IsCollected.Subscribe(HandleOpacity).AddTo(this);
     }
 
     private void HandleSprite(Sprite sprite)

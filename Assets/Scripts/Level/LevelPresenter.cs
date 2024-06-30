@@ -13,7 +13,7 @@ public class LevelPresenter : MonoBehaviour
     {
         _model.SetupLevel(transform);
         
-        _model.OnCollectableClicked.Subscribe(OnCollectableClicked);
+        _model.OnCollectableClicked.Subscribe(OnCollectableClicked).AddTo(this);
     }
 
     private void OnCollectableClicked(CollectablePresenter collectable)

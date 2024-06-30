@@ -1,9 +1,8 @@
-﻿using System;
-using UniRx;
+﻿using UniRx;
 using UnityEngine;
 using Zenject;
 
-public class CollectablePresenter : MonoBehaviour, IDisposable
+public class CollectablePresenter : MonoBehaviour
 {
     [SerializeField] private SpriteRenderer _renderer;
 
@@ -11,12 +10,10 @@ public class CollectablePresenter : MonoBehaviour, IDisposable
     
     [Inject] private CollectableModel _model;
     [Inject] private ISpriteProvider _spriteProvider;
-
-    private IMemoryPool _pool;
     
     private void Awake()
     {
-        _model.Sprite.Subscribe(HandleSprite);
+        _model.Sprite.Subscribe(HandleSprite).AddTo(this);
     }
 
     private void HandleSprite(Sprite sprite)
@@ -27,11 +24,6 @@ public class CollectablePresenter : MonoBehaviour, IDisposable
     public void Initialize(CollectableType type)
     {
         _model.Initialize(type);
-    }
-
-    public void Dispose()
-    {
-        _pool.Despawn(this);
     }
 }
 

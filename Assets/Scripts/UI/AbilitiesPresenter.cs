@@ -11,8 +11,8 @@ public class AbilitiesPresenter : MonoBehaviour
     
     private void Awake()
     {
-        _magnetButton.OnClickAsObservable().Subscribe(_ => OnMagnetButtonPressed());
-        _compassButton.OnClickAsObservable().Subscribe(_ => OnCompassButtonPressed());
+        _magnetButton.OnClickAsObservable().Subscribe(_ => OnMagnetButtonPressed()).AddTo(this);
+        _compassButton.OnClickAsObservable().Subscribe(_ => OnCompassButtonPressed()).AddTo(this);
     }
 
     private void OnMagnetButtonPressed()

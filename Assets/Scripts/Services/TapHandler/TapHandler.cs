@@ -1,21 +1,24 @@
-﻿using UniRx;
+﻿using System;
+using UniRx;
 using UnityEngine;
 using Zenject;
 
-public class TapHandler : IInitializable
+public class TapHandler : DisposableEntity, IInitializable
 {
     [Inject] private CameraTracker _cameraTracker;
     
     private Vector2 _worldPointOnStartScroll;
 
+    private IObservable<Touch> touchStream;
+
     public void Initialize()
     {
-        var touchStream = Observable.EveryUpdate()
+        touchStream = Observable.EveryUpdate()
             .Where(_ => Input.touchCount != 0)
             .Select(_ => Input.GetTouch(0));
 
-        touchStream.Subscribe(ScrollCamera);
-        touchStream.Subscribe(CheckOnCollectable);
+        touchStream.Subscribe(ScrollCamera).AddTo(this);
+        touchStream.Subscribe(CheckOnCollectable).AddTo(this);
     }
     
     private void ScrollCamera(Touch touch)

@@ -7,7 +7,7 @@ using UnityEngine;
 using Zenject;
 using Random = UnityEngine.Random;
 
-public class LevelModel
+public class LevelModel : DisposableEntity
 {
     [Inject] private LevelSpawnData _data;
     [Inject] private ProducerData _producerData;
@@ -57,7 +57,7 @@ public class LevelModel
             foreach (ProducerSaveData producerData in _saveProvider.SaveData.ProducersData)
             {
                 ProducerPresenter producer = _levelSpawner.SpawnAndPlaceProducer(producerData);
-                producer.Model.OnCollect.Subscribe(_ => OnProducerCollect(producer));
+                producer.Model.OnCollect.Subscribe(_ => OnProducerCollect(producer)).AddTo(this);
             }
             
             return;
@@ -69,7 +69,7 @@ public class LevelModel
             producer.Id = i;
             SaveProducer(producer);
 
-            producer.Model.OnCollect.Subscribe(_ => OnProducerCollect(producer));
+            producer.Model.OnCollect.Subscribe(_ => OnProducerCollect(producer)).AddTo(this);
         }
         
         for (int i = 0; i < _data.InitialSpawnNumber; i++)
@@ -97,7 +97,7 @@ public class LevelModel
         instance.Model.OnCollect.Subscribe(_ =>
         {
             OnCollectableCollect(instance);
-        });
+        }).AddTo(this);
 
         return instance;
     }
@@ -108,7 +108,7 @@ public class LevelModel
         instance.Model.OnCollect.Subscribe(_ =>
         {
             OnCollectableCollect(instance);
-        });
+        }).AddTo(this);
 
         return instance;
     }
@@ -154,7 +154,7 @@ public class LevelModel
         instance.Model.OnCollect.Subscribe(_ =>
         {
             OnCollectableCollect(instance);
-        });
+        }).AddTo(this);
     }
 
     private void SaveEntity(CollectablePresenter entity)
@@ -169,7 +169,7 @@ public class LevelModel
         {
             _saveProvider.SaveData.EntitiesData.Remove(hiddenObjectData);
             _saveProvider.Save();
-        });
+        }).AddTo(this);
     }
 
     private void SaveProducer(ProducerPresenter producer)
