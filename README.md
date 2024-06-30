@@ -12,7 +12,10 @@ This is my test task on hidden object game.
 You can check the result by downloading project or check out the video:
 
 
-https://github.com/Arimekiku/HiddenObjectsGame/assets/111116652/b9b305e4-364a-4e6e-b11b-c684d27984df
+
+https://github.com/Arimekiku/HiddenObjectsGame/assets/111116652/616a3c0d-ffb9-4530-a96d-b24c3b85995d
+
+
 
 ## Afterword
 I really struggled on that one because of MVP architecture that i tried to follow and completely new approaches in unirx/zenject usings (Like factories or pools from zenject that i never used before).
