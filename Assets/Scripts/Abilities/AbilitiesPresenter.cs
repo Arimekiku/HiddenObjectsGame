@@ -69,6 +69,9 @@ public class AbilitiesPresenter : MonoBehaviour
             
             if (hit.collider.TryGetComponent(out ProducerPresenter producer))
             {
+                if (producer.Model.IsCollected.Value == true)
+                    continue;
+                
                 Vector2 cameraPosition = _tracker.MainCamera.transform.position;
                 
                 producer.transform.position = cameraPosition;
