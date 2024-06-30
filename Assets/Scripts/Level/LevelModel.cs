@@ -19,12 +19,14 @@ public class LevelModel
     
     private readonly CollectableType[] _hiddenObjectTypes;
     private readonly List<CollectablePresenter> _hiddenObjects;
+    private readonly List<ProducerPresenter> _producers;
     
     public LevelModel()
     {
         OnCollectableClicked = new ReactiveCommand<CollectablePresenter>();
 
         _hiddenObjects = new List<CollectablePresenter>();
+        _producers = new List<ProducerPresenter>();
         
         _hiddenObjectTypes = new CollectableType[]
         {
@@ -49,8 +51,25 @@ public class LevelModel
         {
             foreach (HiddenObjectSaveData entityData in _saveProvider.SaveData.EntitiesData)
                 _hiddenObjects.Add(CreateNextInstance(mapBounds, entityData));
+
+            foreach (ProducerSaveData producerData in _saveProvider.SaveData.ProducersData)
+            {
+                ProducerPresenter producer = _levelSpawner.SpawnAndPlaceProducer(producerData);
+                producer.Model.OnCollect.Subscribe(_ => OnProducerCollect(producer));
+
+                _producers.Add(producer);
+            }
             
             return;
+        }
+
+        for (int i = 0; i < _data.ObjectProducersNumber; i++)
+        {
+            ProducerPresenter producer = _levelSpawner.SpawnAndPlaceProducer(mapBounds, false);
+            SaveProducer(producer);
+
+            producer.Model.OnCollect.Subscribe(_ => OnProducerCollect(producer));
+            _producers.Add(producer);
         }
         
         for (int i = 0; i < _data.InitialSpawnNumber; i++)
@@ -70,19 +89,14 @@ public class LevelModel
     private CollectablePresenter CreateNextInstance(Bounds bounds, params CollectableType[] types)
     {
         CollectableType selectedType = types[Random.Range(0, types.Length)];
-        CollectablePresenter instance = _levelSpawner.SpawnAndPlaceEntity(bounds, selectedType);
+        CollectablePresenter instance = _levelSpawner.SpawnAndPlaceCollectable(bounds, selectedType);
         
         if (!types.Contains(CollectableType.Star) && !types.Contains(CollectableType.Coin))
             SaveEntity(instance);
         
         instance.Model.OnCollect.Subscribe(_ =>
         {
-            OnCollectableClicked.Execute(instance);
-            
-            Observable.Timer(TimeSpan.FromSeconds(10f)).Subscribe(_ =>
-            {
-                EntityCollected(bounds, instance);
-            });
+            OnCollectableCollect(bounds, instance);
         });
 
         return instance;
@@ -90,16 +104,16 @@ public class LevelModel
 
     private CollectablePresenter CreateNextInstance(Bounds bounds, HiddenObjectSaveData hiddenObjectData)
     {
-        CollectablePresenter instance = _levelSpawner.SpawnAndPlaceEntity(hiddenObjectData);
+        CollectablePresenter instance = _levelSpawner.SpawnAndPlaceCollectable(hiddenObjectData);
         instance.Model.OnCollect.Subscribe(_ =>
         {
-            EntityCollected(bounds, instance);
+            OnCollectableCollect(bounds, instance);
         });
 
         return instance;
     }
 
-    private void EntityCollected(Bounds bounds, CollectablePresenter collectable)
+    private void OnCollectableCollect(Bounds bounds, CollectablePresenter collectable)
     {
         OnCollectableClicked.Execute(collectable);
             
@@ -121,6 +135,11 @@ public class LevelModel
         });
     }
 
+    private void OnProducerCollect(ProducerPresenter producer)
+    {
+        CreateNextInstance(producer.SpawnBounds, _hiddenObjectTypes);
+    }
+
     private void SaveEntity(CollectablePresenter entity)
     {
         HiddenObjectSaveData hiddenObjectData = new HiddenObjectSaveData(
@@ -134,5 +153,13 @@ public class LevelModel
             _saveProvider.SaveData.EntitiesData.Remove(hiddenObjectData);
             _saveProvider.Save();
         });
+    }
+
+    private void SaveProducer(ProducerPresenter producer)
+    {
+        ProducerSaveData producerSaveData =
+            new ProducerSaveData(producer.transform.localToWorldMatrix, producer.Model.IsCollected.Value);
+        _saveProvider.SaveData.ProducersData.Add(producerSaveData);
+        _saveProvider.Save();
     }
 }

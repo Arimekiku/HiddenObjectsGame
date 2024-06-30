@@ -106,6 +106,19 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
@@ -223,7 +236,7 @@ TextureImporter:
         width: 36
         height: 36
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -231,6 +244,27 @@ TextureImporter:
       bones: []
       spriteID: 7e6b5cb693671e2488474094315542c4
       internalID: -1668861319
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: producer
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1514
+        width: 154
+        height: 119
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5d3d5fc15ebd6c54cae4650bdb2b62d1
+      internalID: 257605461
       vertices: []
       indices: 
       edges: []
@@ -250,6 +284,7 @@ TextureImporter:
       hammer: -292561787
       joystick: -409697435
       kettle: 1438187015
+      producer: 257605461
       salt: 53356008
       steerwheel: -1903644779
   mipmapLimitGroupName: 

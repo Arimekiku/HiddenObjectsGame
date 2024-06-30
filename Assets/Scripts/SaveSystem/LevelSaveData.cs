@@ -7,11 +7,13 @@ public class LevelSaveData
 {
     public List<CounterSaveData> CountersData;
     public List<HiddenObjectSaveData> EntitiesData;
+    public List<ProducerSaveData> ProducersData;
 
     public LevelSaveData()
     {
         CountersData = new List<CounterSaveData>();
         EntitiesData = new List<HiddenObjectSaveData>();
+        ProducersData = new List<ProducerSaveData>();
     }
 
     public void SaveOrOverwriteCounter(CollectableType type, int newData)

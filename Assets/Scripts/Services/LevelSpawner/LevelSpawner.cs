@@ -8,23 +8,25 @@ using Random = UnityEngine.Random;
 public class LevelSpawner : ILevelSpawner
 {
     private readonly LevelSpawnData _levelSpawnData;
-    private readonly CollectableFactory _factory;
+    private readonly CollectableFactory _collectableFactory;
+    private readonly ProducerFactory _producerFactory;
     private readonly ISpriteProvider _spriteProvider;
 
     private readonly Dictionary<CollectableType, Sprite> CollectableTypeToSprite;
 
-    private LevelSpawner(LevelSpawnData levelSpawnData, CollectableFactory factory, ISpriteProvider spriteProvider)
+    private LevelSpawner(LevelSpawnData levelSpawnData, CollectableFactory collectableFactory, ISpriteProvider spriteProvider, ProducerFactory producerFactory)
     {
         _levelSpawnData = levelSpawnData;
-        _factory = factory;
+        _collectableFactory = collectableFactory;
+        _producerFactory = producerFactory;
         _spriteProvider = spriteProvider;
 
         CollectableTypeToSprite = new Dictionary<CollectableType, Sprite> { { CollectableType.Empty, null } };
     }
 
-    public CollectablePresenter SpawnAndPlaceEntity(Bounds levelBounds, CollectableType type)
+    public CollectablePresenter SpawnAndPlaceCollectable(Bounds levelBounds, CollectableType type)
     {
-        CollectablePresenter instance = _factory.Create();
+        CollectablePresenter instance = _collectableFactory.Create();
         instance.Initialize(type);
 
         Vector2 randomPoint = GetRandomPointInCollider(levelBounds);
@@ -40,9 +42,9 @@ public class LevelSpawner : ILevelSpawner
         return instance;
     }
 
-    public CollectablePresenter SpawnAndPlaceEntity(HiddenObjectSaveData saveData)
+    public CollectablePresenter SpawnAndPlaceCollectable(HiddenObjectSaveData saveData)
     {
-        CollectablePresenter instance = _factory.Create();
+        CollectablePresenter instance = _collectableFactory.Create();
         instance.Initialize(saveData.Type);
         
         instance.transform.position = saveData.Position;
@@ -53,11 +55,40 @@ public class LevelSpawner : ILevelSpawner
         return instance;
     }
 
+    public ProducerPresenter SpawnAndPlaceProducer(Bounds levelBounds, bool isCollected)
+    {
+        ProducerPresenter instance = _producerFactory.Create();
+        instance.Model.Initialize(isCollected);
+        
+        Vector2 randomPoint = GetRandomPointInCollider(levelBounds);
+        instance.transform.position = randomPoint;
+
+        LoadSprite(instance);
+        return instance;
+    }
+    
+    public ProducerPresenter SpawnAndPlaceProducer(ProducerSaveData saveData)
+    {
+        ProducerPresenter instance = _producerFactory.Create();
+        instance.Model.Initialize(saveData.IsCollected);
+        
+        instance.transform.position = saveData.Position;
+
+        LoadSprite(instance);
+        return instance;
+    }
+
     private async void LoadSprite(CollectablePresenter instance, CollectableType type)
     {
         Sprite sprite = await LoadSprite(type);
         instance.Model.UpdateSprite(sprite);
     }
+
+    private async void LoadSprite(ProducerPresenter instance)
+    {
+        Sprite sprite = await LoadSprite(CollectableType.Producer);
+        instance.Model.UpdateSprite(sprite);
+    } 
     
     private Vector2 GetRandomPointInCollider(Bounds mapBounds)
     {

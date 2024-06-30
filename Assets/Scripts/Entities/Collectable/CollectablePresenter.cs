@@ -17,23 +17,11 @@ public class CollectablePresenter : MonoBehaviour, IDisposable
     private void Awake()
     {
         _model.Sprite.Subscribe(HandleSprite);
-        _model.IsVisible.Subscribe(HandleVisibility);
-        _model.Position.Subscribe(HandlePosition);
     }
 
     private void HandleSprite(Sprite sprite)
     {
         _renderer.sprite = sprite;
-    }
-
-    private void HandlePosition(Vector3 position)
-    {
-        transform.position = position;
-    }
-
-    private void HandleVisibility(bool visible)
-    {
-        gameObject.SetActive(visible);
     }
 
     public void Initialize(CollectableType type)

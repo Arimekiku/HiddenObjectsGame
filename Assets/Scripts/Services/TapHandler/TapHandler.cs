@@ -42,9 +42,10 @@ public class TapHandler : IInitializable
         Vector2 worldPosition = _cameraTracker.MainCamera.ScreenToWorldPoint(touch.position);
         RaycastHit2D raycastHit2D = Physics2D.Raycast(worldPosition, Vector2.zero);
         
-        if (!raycastHit2D.collider.TryGetComponent(out CollectablePresenter collectable)) 
-            return;
+        if (raycastHit2D.collider.TryGetComponent(out CollectablePresenter collectable))
+            collectable.Model.Collect();
         
-        collectable.Model.Collect();
+        if (raycastHit2D.collider.TryGetComponent(out ProducerPresenter producer)) 
+            producer.Model.Collect();
     }
 }
