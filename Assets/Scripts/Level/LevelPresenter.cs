@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Linq;
+using ModestTree;
 using UniRx;
 using UnityEngine;
 using Zenject;
@@ -11,6 +12,7 @@ public class LevelPresenter : MonoBehaviour
     [Inject] private LevelCurrencyData _currencyData;
     [Inject] private LevelModel _model;
     [Inject] private CounterProvider _uiSpawner;
+    [Inject] private ILevelSwapper _levelSwapper;
     
     private void Awake()
     {
@@ -54,6 +56,12 @@ public class LevelPresenter : MonoBehaviour
 
     private void OnHiddenObjectClick(CollectablePresenter hiddenObject)
     {
+        if (_model.HiddenObjects.IsEmpty())
+        {
+            _levelSwapper.LoadNextLevel();
+            return;
+        }
+        
         hiddenObject.gameObject.SetActive(false);
         
         _uiSpawner.CollectAnimation(hiddenObject, 1);

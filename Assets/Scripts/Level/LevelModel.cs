@@ -4,7 +4,6 @@ using System.Linq;
 using UniRx;
 using UnityEngine;
 using Zenject;
-using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
 
 public class LevelModel

@@ -36,6 +36,7 @@ public class LevelInstaller : MonoInstaller<LevelInstaller>
         Container.BindInterfacesAndSelfTo<SpriteProvider>().AsSingle();
         Container.BindInterfacesAndSelfTo<TapHandler>().AsSingle();
         Container.BindInterfacesAndSelfTo<LevelSpawner>().AsSingle();
+        Container.BindInterfacesAndSelfTo<LevelSwapper>().AsSingle();
     }
 
     private void BindPresenters()
