@@ -3,7 +3,7 @@ using UniRx;
 using UnityEngine;
 using Zenject;
 
-public class CollectablePresenter : MonoBehaviour, IPoolable<CollectableType, IMemoryPool>, IDisposable
+public class CollectablePresenter : MonoBehaviour, IDisposable
 {
     [SerializeField] private SpriteRenderer _renderer;
 
@@ -36,16 +36,9 @@ public class CollectablePresenter : MonoBehaviour, IPoolable<CollectableType, IM
         gameObject.SetActive(visible);
     }
 
-    public void OnSpawned(CollectableType type, IMemoryPool pool)
+    public void Initialize(CollectableType type)
     {
-        _pool = pool;
         _model.Initialize(type);
-    }
-
-    public void OnDespawned()
-    {
-        _pool = null;
-        _model.Dispose();
     }
 
     public void Dispose()
@@ -54,4 +47,4 @@ public class CollectablePresenter : MonoBehaviour, IPoolable<CollectableType, IM
     }
 }
 
-public class CollectableFactory : PlaceholderFactory<CollectableType, CollectablePresenter> { }
+public class CollectableFactory : PlaceholderFactory<CollectablePresenter> { }

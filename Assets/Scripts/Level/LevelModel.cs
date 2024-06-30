@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ModestTree;
 using UniRx;
 using UnityEngine;
 using Zenject;
@@ -10,20 +11,21 @@ public class LevelModel
 {
     [Inject] private LevelSpawnData _data;
     [Inject] private ILevelSpawner _levelSpawner;
+    [Inject] private SaveProvider _saveProvider;
 
+    public readonly ReactiveCommand<CollectablePresenter> OnCollectableClicked;
+
+    public bool IsCompleted => _hiddenObjects.IsEmpty();
+    
     private readonly CollectableType[] _hiddenObjectTypes;
-
-    public IReadOnlyList<CollectablePresenter> Coins =>
-        _levelSpawner.Collectables.Where(c => c.Model.Type == CollectableType.Coin).ToList();
-
-    public IReadOnlyList<CollectablePresenter> Stars =>
-        _levelSpawner.Collectables.Where(c => c.Model.Type == CollectableType.Star).ToList();
-
-    public IReadOnlyList<CollectablePresenter> HiddenObjects =>
-        _levelSpawner.Collectables.Where(c => _hiddenObjectTypes.Any(t => t == c.Model.Type)).ToList();
-
+    private readonly List<CollectablePresenter> _hiddenObjects;
+    
     public LevelModel()
     {
+        OnCollectableClicked = new ReactiveCommand<CollectablePresenter>();
+
+        _hiddenObjects = new List<CollectablePresenter>();
+        
         _hiddenObjectTypes = new CollectableType[]
         {
             CollectableType.Hammer,
@@ -34,44 +36,103 @@ public class LevelModel
         };
     }
 
-    public void SpawnEntitiesInBounds(Bounds mapBounds)
+    public void SetupLevel(Bounds mapBounds)
     {
-        for (int i = 0; i < _data.MaxSpawnNumber; i++)
-        {
-            CollectableType hiddenObjectType = _hiddenObjectTypes[Random.Range(0, _hiddenObjectTypes.Length)];
-            _levelSpawner.SpawnAndPlaceEntity(mapBounds, hiddenObjectType);
+        SpawnHiddenObjects(mapBounds);
 
-            _levelSpawner.SpawnAndPlaceEntity(mapBounds, CollectableType.Coin);
-            _levelSpawner.SpawnAndPlaceEntity(mapBounds, CollectableType.Star);
-        }
-
-        for (int i = 0; i < _data.InitialSpawnNumber; i++)
-        {
-            CollectablePresenter hidden = GetCollectableOfType(_hiddenObjectTypes);
-            hidden.gameObject.SetActive(true);
-
-            CollectablePresenter coin = GetCollectableOfType(CollectableType.Coin);
-            coin.gameObject.SetActive(true);
-
-            CollectablePresenter star = GetCollectableOfType(CollectableType.Star);
-            star.gameObject.SetActive(true);
-        }
-
-        foreach (CollectablePresenter collectable in _levelSpawner.Collectables)
-            collectable.Model.OnCollect.Subscribe(_ => _levelSpawner.RemoveEntity(collectable));
+        SpawnCoinsAndStars(mapBounds);
     }
 
-    private CollectablePresenter GetCollectableOfType(params CollectableType[] types)
+    private void SpawnHiddenObjects(Bounds mapBounds)
     {
-        foreach (CollectablePresenter collectable in _levelSpawner.Collectables)
+        if (!_saveProvider.SaveData.EntitiesData.IsEmpty())
         {
-            if (collectable.gameObject.activeSelf == true)
-                continue;
-
-            if (types.Any(t => t == collectable.Model.Type))
-                return collectable;
+            foreach (HiddenObjectSaveData entityData in _saveProvider.SaveData.EntitiesData)
+                _hiddenObjects.Add(CreateNextInstance(mapBounds, entityData));
+            
+            return;
         }
+        
+        for (int i = 0; i < _data.InitialSpawnNumber; i++)
+            _hiddenObjects.Add(CreateNextInstance(mapBounds, _hiddenObjectTypes));
+    }
 
-        throw new Exception("Can't process collectable request");
+    private void SpawnCoinsAndStars(Bounds mapBounds)
+    {
+        for (int i = 0; i < _data.InitialSpawnNumber; i++)
+        {
+            CreateNextInstance(mapBounds, CollectableType.Coin);
+
+            CreateNextInstance(mapBounds, CollectableType.Star);
+        }
+    }
+
+    private CollectablePresenter CreateNextInstance(Bounds bounds, params CollectableType[] types)
+    {
+        CollectableType selectedType = types[Random.Range(0, types.Length)];
+        CollectablePresenter instance = _levelSpawner.SpawnAndPlaceEntity(bounds, selectedType);
+        
+        if (!types.Contains(CollectableType.Star) && !types.Contains(CollectableType.Coin))
+            SaveEntity(instance);
+        
+        instance.Model.OnCollect.Subscribe(_ =>
+        {
+            OnCollectableClicked.Execute(instance);
+            
+            Observable.Timer(TimeSpan.FromSeconds(10f)).Subscribe(_ =>
+            {
+                EntityCollected(bounds, instance);
+            });
+        });
+
+        return instance;
+    }
+
+    private CollectablePresenter CreateNextInstance(Bounds bounds, HiddenObjectSaveData hiddenObjectData)
+    {
+        CollectablePresenter instance = _levelSpawner.SpawnAndPlaceEntity(hiddenObjectData);
+        instance.Model.OnCollect.Subscribe(_ =>
+        {
+            EntityCollected(bounds, instance);
+        });
+
+        return instance;
+    }
+
+    private void EntityCollected(Bounds bounds, CollectablePresenter collectable)
+    {
+        OnCollectableClicked.Execute(collectable);
+            
+        Observable.Timer(TimeSpan.FromSeconds(10f)).Subscribe(_ =>
+        {
+            if (collectable.Model.Type == CollectableType.Star)
+            {
+                CreateNextInstance(bounds, CollectableType.Star);
+                return;
+            }
+
+            if (collectable.Model.Type == CollectableType.Coin)
+            {
+                CreateNextInstance(bounds, CollectableType.Coin);
+                return;
+            }
+            
+            _hiddenObjects.Add(CreateNextInstance(bounds, _hiddenObjectTypes));
+        });
+    }
+
+    private void SaveEntity(CollectablePresenter entity)
+    {
+        HiddenObjectSaveData hiddenObjectData = new HiddenObjectSaveData(
+            entity.transform.localToWorldMatrix, 
+            entity.Model.Type);
+        _saveProvider.SaveData.EntitiesData.Add(hiddenObjectData);
+        _saveProvider.Save();
+            
+        entity.Model.OnCollect.Subscribe(_ =>
+        {
+            _saveProvider.SaveData.EntitiesData.Remove(hiddenObjectData);
+            _saveProvider.Save();
+        });
     }
 }

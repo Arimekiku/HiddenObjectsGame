@@ -7,15 +7,11 @@ using Random = UnityEngine.Random;
 
 public class LevelSpawner : ILevelSpawner
 {
-    public IReadOnlyList<CollectablePresenter> Collectables => _collectables;
-    
     private readonly LevelSpawnData _levelSpawnData;
     private readonly CollectableFactory _factory;
     private readonly ISpriteProvider _spriteProvider;
 
     private readonly Dictionary<CollectableType, Sprite> CollectableTypeToSprite;
-    
-    private List<CollectablePresenter> _collectables;
 
     private LevelSpawner(LevelSpawnData levelSpawnData, CollectableFactory factory, ISpriteProvider spriteProvider)
     {
@@ -23,15 +19,13 @@ public class LevelSpawner : ILevelSpawner
         _factory = factory;
         _spriteProvider = spriteProvider;
 
-        _collectables = new List<CollectablePresenter>();
-
         CollectableTypeToSprite = new Dictionary<CollectableType, Sprite> { { CollectableType.Empty, null } };
     }
 
-    public async void SpawnAndPlaceEntity(Bounds levelBounds, CollectableType type)
+    public CollectablePresenter SpawnAndPlaceEntity(Bounds levelBounds, CollectableType type)
     {
-        CollectablePresenter instance = _factory.Create(type);
-        _collectables.Add(instance);
+        CollectablePresenter instance = _factory.Create();
+        instance.Initialize(type);
 
         Vector2 randomPoint = GetRandomPointInCollider(levelBounds);
         instance.transform.position = randomPoint;
@@ -42,13 +36,27 @@ public class LevelSpawner : ILevelSpawner
         float randomRotation = Random.Range(0f, 360);
         instance.transform.rotation = Quaternion.Euler(0, 0, randomRotation);
         
-        Sprite sprite = await LoadSprite(type);
-        instance.Model.UpdateSprite(sprite);
+        LoadSprite(instance, type);
+        return instance;
     }
 
-    public void RemoveEntity(CollectablePresenter entity)
+    public CollectablePresenter SpawnAndPlaceEntity(HiddenObjectSaveData saveData)
     {
-        _collectables.Remove(entity);
+        CollectablePresenter instance = _factory.Create();
+        instance.Initialize(saveData.Type);
+        
+        instance.transform.position = saveData.Position;
+        instance.transform.localScale = saveData.Scale;
+        instance.transform.rotation = Quaternion.Euler(saveData.Rotation);
+        
+        LoadSprite(instance, saveData.Type);
+        return instance;
+    }
+
+    private async void LoadSprite(CollectablePresenter instance, CollectableType type)
+    {
+        Sprite sprite = await LoadSprite(type);
+        instance.Model.UpdateSprite(sprite);
     }
     
     private Vector2 GetRandomPointInCollider(Bounds mapBounds)

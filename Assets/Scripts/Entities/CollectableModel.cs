@@ -13,7 +13,7 @@ public class CollectableModel
 
     public CollectableModel()
     {
-        IsVisible = new BoolReactiveProperty(true);
+        IsVisible = new BoolReactiveProperty();
         Sprite = new ReactiveProperty<Sprite>();
         Position = new Vector3ReactiveProperty();
 
@@ -24,7 +24,7 @@ public class CollectableModel
 
     public void Initialize(CollectableType type)
     {
-        IsVisible.Value = false;
+        IsVisible.Value = true;
         Type = type;
     }
 

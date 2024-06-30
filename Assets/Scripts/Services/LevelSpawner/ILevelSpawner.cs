@@ -1,10 +1,7 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public interface ILevelSpawner
 {
-    public IReadOnlyList<CollectablePresenter> Collectables { get; }
-    
-    public void SpawnAndPlaceEntity(Bounds levelBounds, CollectableType type);
-    public void RemoveEntity(CollectablePresenter entity);
+    public CollectablePresenter SpawnAndPlaceEntity(Bounds levelBounds, CollectableType type);
+    public CollectablePresenter SpawnAndPlaceEntity(HiddenObjectSaveData saveData);
 }

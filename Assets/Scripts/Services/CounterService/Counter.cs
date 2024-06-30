@@ -7,7 +7,7 @@ public class Counter : ICounter
     
     public Counter()
     {
-        Count = new IntReactiveProperty();
+        Count = new IntReactiveProperty(0);
         
         Type = CollectableType.Empty;
     }
@@ -15,8 +15,6 @@ public class Counter : ICounter
     public void Initialize(CollectableType type)
     {
         Type = type;
-
-        Count.Value = 0;
     }
     
     public void Add(int value)

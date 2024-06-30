@@ -17,11 +17,20 @@ public class LevelInstaller : MonoInstaller<LevelInstaller>
     
     public override void InstallBindings()
     {
+        BindSaveSystem();
         BindConfig();
         BindServices();
         BindPresenters();
         BindLevel();
         BindHiddenObjects();
+    }
+
+    private void BindSaveSystem()
+    {
+        SaveProvider saveProvider = new SaveProvider(new JsonSaveMaker());
+        saveProvider.Load();
+        
+        Container.BindInterfacesAndSelfTo<SaveProvider>().FromInstance(saveProvider).AsSingle();
     }
 
     private void BindConfig()
@@ -53,12 +62,8 @@ public class LevelInstaller : MonoInstaller<LevelInstaller>
     {
         Container.BindInterfacesAndSelfTo<CollectableModel>().AsTransient();
         Container
-            .BindFactory<CollectableType, CollectablePresenter, CollectableFactory>()
-            .FromMonoPoolableMemoryPool(
-                p 
-                    => p.WithInitialSize((int)(_levelSpawnData.MaxSpawnNumber * 3 + _levelSpawnData.ObjectProducersNumber))
-                .FromComponentInNewPrefab(_collectablePresenterPrefab)
-                .UnderTransformGroup("Collectables"));
+            .BindFactory<CollectablePresenter, CollectableFactory>()
+            .FromComponentInNewPrefab(_collectablePresenterPrefab);
         
         Container.BindInterfacesAndSelfTo<Counter>().AsTransient();
         Container.BindFactory<CollectableModel, CollectableUIPresenter, CollectableUIFactory>()
