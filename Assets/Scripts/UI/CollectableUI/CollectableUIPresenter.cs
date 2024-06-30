@@ -1,26 +1,19 @@
-﻿using UniRx;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
+using Zenject;
 
 public class CollectableUIPresenter : MonoBehaviour
 {
-    [SerializeField] private Sprite _sprite;
     [SerializeField] private CollectableType _type;
-    [SerializeField] private Image _renderer;
+    [SerializeField] private Image _image;
 
-    private CollectableUIModel _collectableUIModel;
+    [Inject] private CollectableModel _model;
 
     private void Awake()
     {
-        _collectableUIModel = new CollectableUIModel();
-
-        _collectableUIModel.Sprite.Subscribe(UpdateSprite);
-        
-        _collectableUIModel.Initialize(_type, _sprite);
-    }
-
-    private void UpdateSprite(Sprite newSprite)
-    {
-        _renderer.sprite = newSprite;
+        _type = _model.Type;
+        _image.sprite = _model.Sprite.Value;
     }
 }
+
+public class CollectableUIFactory : PlaceholderFactory<CollectableModel, CollectableUIPresenter> { }

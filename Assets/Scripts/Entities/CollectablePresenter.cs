@@ -3,7 +3,7 @@ using UniRx;
 using UnityEngine;
 using Zenject;
 
-public class CollectablePresenter : MonoBehaviour, IPoolable<Sprite, CollectableType, IMemoryPool>, IDisposable
+public class CollectablePresenter : MonoBehaviour, IPoolable<CollectableType, IMemoryPool>, IDisposable
 {
     [SerializeField] private SpriteRenderer _renderer;
 
@@ -16,23 +16,9 @@ public class CollectablePresenter : MonoBehaviour, IPoolable<Sprite, Collectable
     
     private void Awake()
     {
-        _model.IsCollected.Subscribe(HandleDeath);
         _model.Sprite.Subscribe(HandleSprite);
         _model.IsVisible.Subscribe(HandleVisibility);
         _model.Position.Subscribe(HandlePosition);
-    }
-    
-    public void Collect()
-    {
-        _model.Collect();
-    }
-
-    private void HandleDeath(bool value)
-    {
-        if (value == false)
-            return;
-        
-        DestroyImmediate(gameObject);
     }
 
     private void HandleSprite(Sprite sprite)
@@ -50,10 +36,10 @@ public class CollectablePresenter : MonoBehaviour, IPoolable<Sprite, Collectable
         gameObject.SetActive(visible);
     }
 
-    public void OnSpawned(Sprite sprite, CollectableType type, IMemoryPool pool)
+    public void OnSpawned(CollectableType type, IMemoryPool pool)
     {
         _pool = pool;
-        _model.Initialize(sprite, type);
+        _model.Initialize(type);
     }
 
     public void OnDespawned()
@@ -68,4 +54,4 @@ public class CollectablePresenter : MonoBehaviour, IPoolable<Sprite, Collectable
     }
 }
 
-public class CollectableFactory : PlaceholderFactory<Sprite, CollectableType, CollectablePresenter> { }
+public class CollectableFactory : PlaceholderFactory<CollectableType, CollectablePresenter> { }

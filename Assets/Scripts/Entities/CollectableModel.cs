@@ -5,30 +5,31 @@ public class CollectableModel
 {
     public CollectableType Type { get; private set; }
     
-    public BoolReactiveProperty IsCollected { get; }
     public BoolReactiveProperty IsVisible { get; }
     public ReactiveProperty<Sprite> Sprite { get; }
     public Vector3ReactiveProperty Position { get; }
+    
+    public ReactiveCommand OnCollect { get; }
 
     public CollectableModel()
     {
-        IsCollected = new BoolReactiveProperty(false);
         IsVisible = new BoolReactiveProperty(true);
         Sprite = new ReactiveProperty<Sprite>();
         Position = new Vector3ReactiveProperty();
+
+        OnCollect = new ReactiveCommand();
+        
         Type = CollectableType.Empty;
     }
 
-    public void Initialize(Sprite sprite, CollectableType type)
+    public void Initialize(CollectableType type)
     {
         IsVisible.Value = false;
-        Sprite.Value = sprite;
         Type = type;
     }
 
     public void Dispose()
     {
-        IsCollected.Value = false;
         IsVisible.Value = false;
         Sprite.Value = null;
         Position.Value = Vector3.zero;
@@ -37,7 +38,7 @@ public class CollectableModel
 
     public void Collect()
     {
-        IsCollected.Value = true;
+        OnCollect.Execute();
     }
 
     public void UpdateSprite(Sprite sprite)

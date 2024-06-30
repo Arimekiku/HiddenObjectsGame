@@ -1,7 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public interface ILevelSpawner
 {
-    public Task<CollectablePresenter> SpawnAndPlaceEntity(Bounds levelBounds, CollectableType type);
+    public IReadOnlyList<CollectablePresenter> Collectables { get; }
+    
+    public void SpawnAndPlaceEntity(Bounds levelBounds, CollectableType type);
+    public void RemoveEntity(CollectablePresenter entity);
 }

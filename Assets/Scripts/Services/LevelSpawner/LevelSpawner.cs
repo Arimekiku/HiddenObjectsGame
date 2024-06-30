@@ -7,11 +7,15 @@ using Random = UnityEngine.Random;
 
 public class LevelSpawner : ILevelSpawner
 {
+    public IReadOnlyList<CollectablePresenter> Collectables => _collectables;
+    
     private readonly LevelSpawnData _levelSpawnData;
     private readonly CollectableFactory _factory;
     private readonly ISpriteProvider _spriteProvider;
 
     private readonly Dictionary<CollectableType, Sprite> CollectableTypeToSprite;
+    
+    private List<CollectablePresenter> _collectables;
 
     private LevelSpawner(LevelSpawnData levelSpawnData, CollectableFactory factory, ISpriteProvider spriteProvider)
     {
@@ -19,14 +23,15 @@ public class LevelSpawner : ILevelSpawner
         _factory = factory;
         _spriteProvider = spriteProvider;
 
+        _collectables = new List<CollectablePresenter>();
+
         CollectableTypeToSprite = new Dictionary<CollectableType, Sprite> { { CollectableType.Empty, null } };
     }
 
-    public async Task<CollectablePresenter> SpawnAndPlaceEntity(Bounds levelBounds, CollectableType type)
+    public async void SpawnAndPlaceEntity(Bounds levelBounds, CollectableType type)
     {
-        await LoadSprite(type);
-        
-        CollectablePresenter instance = _factory.Create(CollectableTypeToSprite[type], type);
+        CollectablePresenter instance = _factory.Create(type);
+        _collectables.Add(instance);
 
         Vector2 randomPoint = GetRandomPointInCollider(levelBounds);
         instance.transform.position = randomPoint;
@@ -36,8 +41,14 @@ public class LevelSpawner : ILevelSpawner
 
         float randomRotation = Random.Range(0f, 360);
         instance.transform.rotation = Quaternion.Euler(0, 0, randomRotation);
+        
+        Sprite sprite = await LoadSprite(type);
+        instance.Model.UpdateSprite(sprite);
+    }
 
-        return instance;
+    public void RemoveEntity(CollectablePresenter entity)
+    {
+        _collectables.Remove(entity);
     }
     
     private Vector2 GetRandomPointInCollider(Bounds mapBounds)
@@ -58,10 +69,10 @@ public class LevelSpawner : ILevelSpawner
         return Vector2.zero;
     }
 
-    private async Task LoadSprite(CollectableType type)
+    private async Task<Sprite> LoadSprite(CollectableType type)
     {
-        if (CollectableTypeToSprite.ContainsKey(type))
-            return;
+        if (CollectableTypeToSprite.TryGetValue(type, out var loadSprite))
+            return loadSprite;
             
         if (!Enum.IsDefined(typeof(CollectableType), type))
             throw new Exception($"Requested type does not defined in Enum {typeof(CollectableType)}");
@@ -73,5 +84,6 @@ public class LevelSpawner : ILevelSpawner
         Sprite sprite = await _spriteProvider.Load(loadId);
         
         CollectableTypeToSprite.TryAdd(type, sprite);
+        return sprite;
     }
 }

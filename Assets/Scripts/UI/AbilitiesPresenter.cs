@@ -1,15 +1,14 @@
 ﻿using UniRx;
 using UnityEngine;
 using UnityEngine.UI;
-using Zenject;
 
 public class AbilitiesPresenter : MonoBehaviour
 {
     [SerializeField] private Button _magnetButton;
     [SerializeField] private Button _compassButton;
-
-    [Inject] private IWalletService _wallet;
-
+    [SerializeField] private CollectableUICounter _coinCounter;
+    [SerializeField] private CollectableUICounter _starCounter;
+    
     private void Awake()
     {
         _magnetButton.OnClickAsObservable().Subscribe(_ => OnMagnetButtonPressed());
@@ -18,7 +17,7 @@ public class AbilitiesPresenter : MonoBehaviour
 
     private void OnMagnetButtonPressed()
     {
-        if (!_wallet.TrySpend(_wallet.Coins, 25))
+        if (!_coinCounter.Counter.TryRemove(25))
             return;
         
         Debug.Log("Skill used");
@@ -26,7 +25,7 @@ public class AbilitiesPresenter : MonoBehaviour
 
     private void OnCompassButtonPressed()
     {
-        if (!_wallet.TrySpend(_wallet.Coins, 25))
+        if (!_starCounter.Counter.TryRemove(25))
             return;
         
         Debug.Log("Skill used");

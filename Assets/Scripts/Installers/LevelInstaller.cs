@@ -5,10 +5,12 @@ public class LevelInstaller : MonoInstaller<LevelInstaller>
 {
     [Header("Configs")]
     [SerializeField] private LevelSpawnData _levelSpawnData;
+    [SerializeField] private LevelCurrencyData _currencyData;
 
     [Header("Presenters")] 
     [SerializeField] private CollectablePresenter _collectablePresenterPrefab;
-    [SerializeField] private CurrencyPresenter _currencyPresenter;
+    [SerializeField] private CollectableUIPresenter _uiPresenterPrefab;
+    [SerializeField] private CounterProvider _counterContainer;
     
     [Header("Camera Tracker")] 
     [SerializeField] private CameraTracker _cameraTracker;
@@ -25,19 +27,20 @@ public class LevelInstaller : MonoInstaller<LevelInstaller>
     private void BindConfig()
     {
         Container.BindInstance(_levelSpawnData);
+        Container.BindInstance(_currencyData);
     }
 
     private void BindServices()
     {
+        Container.Bind<CameraTracker>().FromInstance(_cameraTracker);
         Container.BindInterfacesAndSelfTo<SpriteProvider>().AsSingle();
-        Container.BindInterfacesAndSelfTo<TapHandler>().AsSingle().WithArguments(_cameraTracker);
+        Container.BindInterfacesAndSelfTo<TapHandler>().AsSingle();
         Container.BindInterfacesAndSelfTo<LevelSpawner>().AsSingle();
-        Container.BindInterfacesAndSelfTo<WalletService>().AsSingle();
     }
 
     private void BindPresenters()
     {
-        Container.BindInstance(_currencyPresenter);    
+        Container.BindInstance(_counterContainer);
     }
     
     private void BindLevel()
@@ -49,11 +52,15 @@ public class LevelInstaller : MonoInstaller<LevelInstaller>
     {
         Container.BindInterfacesAndSelfTo<CollectableModel>().AsTransient();
         Container
-            .BindFactory<Sprite, CollectableType, CollectablePresenter, CollectableFactory>()
+            .BindFactory<CollectableType, CollectablePresenter, CollectableFactory>()
             .FromMonoPoolableMemoryPool(
                 p 
                     => p.WithInitialSize((int)(_levelSpawnData.MaxSpawnNumber * 3 + _levelSpawnData.ObjectProducersNumber))
                 .FromComponentInNewPrefab(_collectablePresenterPrefab)
                 .UnderTransformGroup("Collectables"));
+        
+        Container.BindInterfacesAndSelfTo<Counter>().AsTransient();
+        Container.BindFactory<CollectableModel, CollectableUIPresenter, CollectableUIFactory>()
+            .FromComponentInNewPrefab(_uiPresenterPrefab);
     }
 }

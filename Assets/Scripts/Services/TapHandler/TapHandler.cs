@@ -45,6 +45,6 @@ public class TapHandler : IInitializable
         if (!raycastHit2D.collider.TryGetComponent(out CollectablePresenter collectable)) 
             return;
         
-        collectable.Collect();
+        collectable.Model.Collect();
     }
 }
