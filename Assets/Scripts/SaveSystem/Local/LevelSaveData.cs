@@ -12,20 +12,30 @@ public class LevelSaveData
     public LevelSaveData()
     {
         CountersData = new List<CounterSaveData>();
+        foreach (CollectableType type in Constants.HiddenObjects)
+            CountersData.Add(new CounterSaveData(type));
+
         EntitiesData = new List<HiddenObjectSaveData>();
         ProducersData = new List<ProducerSaveData>();
     }
 
-    public void SaveOrOverwriteCounter(CollectableType type, int newData)
+    public bool TrySave(CollectableType type, int newData)
     {
         CounterSaveData saveData = CountersData.FirstOrDefault(c => c.Type == type);
+        
         if (saveData == null)
-        {
-            saveData = new CounterSaveData(type);
-            CountersData.Add(saveData);
-        }
+            return false;
         
         saveData.Count = newData;
+        return true;
+    }
+    
+    public void ClearData()
+    {
+        foreach (CounterSaveData data in CountersData)
+            data.Count = 0;
+
+        ProducersData.Clear();
     }
 
     public void UpdateProducer(ProducerPresenter producer)

@@ -23,13 +23,14 @@ public class TapHandler : DisposableEntity, IInitializable
     
     private void ScrollCamera(Touch touch)
     {
+        Vector2 worldPosition = _cameraTracker.MainCamera.ScreenToWorldPoint(touch.position);
         if (touch.phase == TouchPhase.Began)
         {
-            _worldPointOnStartScroll = _cameraTracker.MainCamera.ScreenToWorldPoint(touch.position);
+            _worldPointOnStartScroll = worldPosition;
             return;
         }
 
-        Vector2 touchMove = _cameraTracker.MainCamera.ScreenToWorldPoint(touch.position);
+        Vector2 touchMove = worldPosition;
         Vector3 direction = _worldPointOnStartScroll - touchMove;
 
         _cameraTracker.MainCamera.transform.position += direction;

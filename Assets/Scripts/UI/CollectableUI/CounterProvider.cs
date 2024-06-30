@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using DG.Tweening;
 using UnityEngine;
 using Zenject;
@@ -15,7 +16,10 @@ public class CounterProvider : MonoBehaviour
 
     private void Awake()
     {
-        foreach (CounterSaveData counterData in _saveProvider.SaveData.CountersData)
+        List<CounterSaveData> allCounters = new List<CounterSaveData>(_saveProvider.CurrencyData.CountersData);
+        allCounters.AddRange(_saveProvider.SaveData.CountersData);
+        
+        foreach (CounterSaveData counterData in allCounters)
         {
             foreach (CollectableUICounter uiCounter in _holders)
             {
@@ -38,7 +42,9 @@ public class CounterProvider : MonoBehaviour
         CollectableUICounter counterUI = _holders.First(h => h.Counter.Type == presenter.Model.Type);
         
         counterUI.Counter.Add(changeValue);
-        _saveProvider.SaveData.SaveOrOverwriteCounter(counterUI.Counter.Type, counterUI.Counter.Count.Value);
+        
+        _saveProvider.SaveData.TrySave(counterUI.Counter.Type, counterUI.Counter.Count.Value);
+        _saveProvider.CurrencyData.TrySave(counterUI.Counter.Type, counterUI.Counter.Count.Value);
         _saveProvider.Save();
         
         instance.transform

@@ -7,6 +7,7 @@ public class LevelInstaller : MonoInstaller<LevelInstaller>
     [SerializeField] private LevelSpawnData _levelSpawnData;
     [SerializeField] private LevelCurrencyData _currencyData;
     [SerializeField] private ProducerData _producerData;
+    [SerializeField] private AbilitiesData _abilitiesData;
 
     [Header("Presenters")] 
     [SerializeField] private CollectablePresenter _collectablePresenterPrefab;
@@ -37,6 +38,7 @@ public class LevelInstaller : MonoInstaller<LevelInstaller>
         Container.BindInstance(_levelSpawnData);
         Container.BindInstance(_currencyData);
         Container.BindInstance(_producerData);
+        Container.BindInstance(_abilitiesData);
     }
 
     private void BindServices()

@@ -344,7 +344,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _magnetButton: {fileID: 9114118619729389295}
+  _magnetCost: {fileID: 8930548240389903443}
   _compassButton: {fileID: 4635004505812297539}
+  _compassCost: {fileID: 4291923421912027488}
   _coinCounter: {fileID: 6059857051495091247}
   _starCounter: {fileID: 9168984614636520658}
 --- !u!1 &2079560879726653467
@@ -1224,7 +1226,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 1
-  m_AdditionalShaderChannelsFlag: 0
+  m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 925311719
   m_SortingOrder: 0
