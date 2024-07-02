@@ -16,6 +16,11 @@ You can check the result by downloading project or check out the video:
 https://github.com/Arimekiku/HiddenObjectsGame/assets/111116652/616a3c0d-ffb9-4530-a96d-b24c3b85995d
 
 
+## Weak points
+1. Low flexibility in terms of adding new items;
+2. Low flexibility in terms of adding new levels.
+
+This prototype was made for unirx and zenject practice so there's some crucial weak points that cannot allow this prototype to evolve into a commercial game.
 
 ## Afterword
 I really struggled on that one because of MVP architecture that i tried to follow and completely new approaches in unirx/zenject usings (Like factories or pools from zenject that i never used before).
