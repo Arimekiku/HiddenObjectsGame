@@ -25,6 +25,7 @@ public class LevelModel : DisposableEntity
 
     private readonly List<CollectablePresenter> _hiddenObjects;
     private readonly List<ProducerPresenter> _producers;
+    private readonly List<IDisposable> _timers;
 
     private Transform levelCenter;
 
@@ -33,6 +34,8 @@ public class LevelModel : DisposableEntity
         _hiddenObjects = new List<CollectablePresenter>();
 
         _producers = new List<ProducerPresenter>();
+
+        _timers = new List<IDisposable>();
     }
 
     public void SetupLevel(Transform center, LevelData data)
@@ -158,7 +161,7 @@ public class LevelModel : DisposableEntity
 
     private void EnableFirstValidObject()
     {
-        while (true)
+        for (int i = 0; i < 100; i++)
         {
             int index = Random.Range(0, _hiddenObjects.Count);
             CollectablePresenter instance = _hiddenObjects[index];
@@ -175,9 +178,9 @@ public class LevelModel : DisposableEntity
     {
         _hiddenObjects.Remove(collectable);
 
-        OnCollectableClicked.Execute(collectable);
-
         Observable.Timer(TimeSpan.FromSeconds(10f)).Subscribe(_ => { EnableFirstValidObject(); }).AddTo(this);
+        
+        OnCollectableClicked.Execute(collectable);
     }
 
     private void OnProducerCollect(ProducerPresenter producer)

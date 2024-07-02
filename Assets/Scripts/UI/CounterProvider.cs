@@ -41,12 +41,16 @@ public class CounterProvider : MonoBehaviour
 
         foreach (var counter in _holders)
         {
-            foreach (var counterData in _saveProvider.SaveData.CountersData)
+            List<CounterSaveData> _allCounters = new List<CounterSaveData>(_saveProvider.SaveData.CountersData);
+            _allCounters.AddRange(_saveProvider.CurrencyData.CountersData);
+            
+            foreach (var counterData in _allCounters)
             {
                 if (counterData.Id != counter.CounterModel.Id.Value) 
                     continue;
                 
                 counter.CounterModel.Count.Value = counterData.Count;
+                counter.UpdateText();
             }
         }
     }

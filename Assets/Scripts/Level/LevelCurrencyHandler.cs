@@ -55,13 +55,13 @@ public class LevelCurrencyHandler : DisposableEntity
     {
         _currency.Remove(currency);
         
-        OnCurrencyCollected.Execute(currency);
-        
         Observable.Timer(TimeSpan.FromSeconds(10f)).Subscribe(_ =>
         {
             var newCurrency = _levelSpawner.SpawnAndPlaceCollectable(data.MaxSpawnRadius, center, currency.Model.Sprite.Value);
             newCurrency.Model.OnCollect.Subscribe(_ => OnCurrencyCollect(data, center, newCurrency));
             newCurrency.Model.UpdateVisibility(true);
         }).AddTo(this);
+        
+        OnCurrencyCollected.Execute(currency);
     }
 }
