@@ -16,6 +16,8 @@ public class LevelPresenter : MonoBehaviour
     private async void Awake()
     {
         await _spriteProvider.LoadSprites();
+        
+        _currencyProvider.BuildCurrency();
 
         LoadLevel(_levelSwapper.LoadCurrentLevel());
     }

@@ -10,8 +10,8 @@ public class AbilitiesPresenter : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _magnetCost;
     [SerializeField] private Button _compassButton;
     [SerializeField] private TextMeshProUGUI _compassCost;
-    [SerializeField] private CollectableUICounter _coinCounter;
-    [SerializeField] private CollectableUICounter _starCounter;
+    [SerializeField] private CounterPresenter _coinCounterPresenter;
+    [SerializeField] private CounterPresenter _starCounterPresenter;
 
     [Inject] private CameraTracker _tracker;
     [Inject] private AbilitiesData _data;
@@ -27,7 +27,7 @@ public class AbilitiesPresenter : MonoBehaviour
 
     private void OnMagnetButtonPressed()
     {
-        if (!_coinCounter.Counter.TryRemove((int)_data.MagnetCost))
+        if (!_coinCounterPresenter.CounterModel.TryRemove((int)_data.MagnetCost))
             return;
 
         RaycastHit2D[] rays = Physics2D.CircleCastAll(
@@ -44,12 +44,12 @@ public class AbilitiesPresenter : MonoBehaviour
                 producer.Model.Collect();
         }
         
-        _coinCounter.UpdateText();
+        _coinCounterPresenter.UpdateText();
     }
 
     private void OnCompassButtonPressed()
     {
-        if (!_starCounter.Counter.TryRemove((int)_data.CompassCost))
+        if (!_starCounterPresenter.CounterModel.TryRemove((int)_data.CompassCost))
             return;
         
         RaycastHit2D[] rays = Physics2D.CircleCastAll(
@@ -79,6 +79,6 @@ public class AbilitiesPresenter : MonoBehaviour
             }
         }
         
-        _starCounter.UpdateText();
+        _starCounterPresenter.UpdateText();
     }
 }

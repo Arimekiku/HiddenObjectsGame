@@ -15,6 +15,7 @@ public class LevelModel : DisposableEntity
     [Inject] private SaveProvider _saveProvider;
     [Inject] private SpriteProvider _spriteProvider;
     [Inject] private CameraTracker _cameraTracker;
+    [Inject] private LevelCurrencyHandler _currencyHandler;
 
     public ReactiveCommand<CollectablePresenter> OnCollectableClicked;
 
@@ -37,6 +38,7 @@ public class LevelModel : DisposableEntity
     public void SetupLevel(Transform center, LevelData data)
     {
         OnCollectableClicked = new ReactiveCommand<CollectablePresenter>();
+        _currencyHandler.OnCurrencyCollected.Subscribe(x => OnCollectableClicked.Execute(x)).AddTo(this);
         _cameraTracker.MainCamera.backgroundColor = data.CameraColor;
 
         levelCenter = center;
@@ -48,6 +50,8 @@ public class LevelModel : DisposableEntity
     public void ClearLevel()
     {
         Dispose();
+        
+        _currencyHandler.Clear();
 
         foreach (var collectable in _hiddenObjects)
             Object.Destroy(collectable.gameObject);
@@ -146,7 +150,9 @@ public class LevelModel : DisposableEntity
     {
         for (int i = 0; i < data.InitialSpawnNumber; i++)
         {
-            //TODO: coins and stars
+            _currencyHandler.SpawnCoin(data, levelCenter);
+            
+            _currencyHandler.SpawnStar(data, levelCenter);
         }
     }
 
@@ -181,7 +187,8 @@ public class LevelModel : DisposableEntity
         var instanceSprite = _spriteProvider.GetConcreteSprite(producer.CreateId);
         var instance =
             _levelSpawner.SpawnAndPlaceCollectable(_producerData.SpawnRadius, producer.transform, instanceSprite);
-
+        instance.Model.UpdateVisibility(true);
+        
         while (_hiddenObjects.Any(h => h.UniqueId == instance.UniqueId))
             instance.UniqueId += 1;
 

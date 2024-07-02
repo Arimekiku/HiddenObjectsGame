@@ -12,7 +12,7 @@ public class LevelInstaller : MonoInstaller<LevelInstaller>
     [SerializeField] private CollectablePresenter _collectablePresenterPrefab;
     [SerializeField] private CollectableUIPresenter _uiPresenterPrefab;
     [SerializeField] private ProducerPresenter _producerPresenterPrefab;
-    [SerializeField] private CollectableUICounter _uiCounterPrefab;
+    [SerializeField] private CounterPresenter _uiCounterPresenterPrefab;
     
     [Header("Providers")] 
     [SerializeField] private SpriteProvider _spriteProvider;
@@ -48,12 +48,13 @@ public class LevelInstaller : MonoInstaller<LevelInstaller>
 
     private void BindProviders()
     {
-        Container.BindInstance(_currencyProvider).AsSingle();
         Container.BindInterfacesAndSelfTo<SpriteProvider>().FromInstance(_spriteProvider).AsSingle();
+        Container.BindInterfacesAndSelfTo<CurrencyProvider>().FromInstance(_currencyProvider).AsSingle();
     }
 
     private void BindServices()
     {
+        Container.BindInterfacesAndSelfTo<LevelCurrencyHandler>().AsSingle();
         Container.BindInterfacesAndSelfTo<CameraTracker>().AsSingle();
         Container.BindInterfacesAndSelfTo<TapHandler>().AsSingle();
         Container.BindInterfacesAndSelfTo<LevelSpawner>().AsSingle();
@@ -73,6 +74,9 @@ public class LevelInstaller : MonoInstaller<LevelInstaller>
     private void BindHiddenObjects()
     {
         Container.BindInterfacesAndSelfTo<CollectableModel>().AsTransient();
+        Container.BindInterfacesAndSelfTo<ProducerModel>().AsTransient();
+        Container.BindInterfacesAndSelfTo<CounterModel>().AsTransient();
+        
         Container
             .BindFactory<CollectablePresenter, CollectableFactory>()
             .FromComponentInNewPrefab(_collectablePresenterPrefab);
@@ -80,11 +84,9 @@ public class LevelInstaller : MonoInstaller<LevelInstaller>
         Container.BindFactory<CollectablePresenter, CollectableUIPresenter, CollectableUIFactory>()
             .FromComponentInNewPrefab(_uiPresenterPrefab);
 
-        Container.BindFactory<int, CollectableUICounter, CollectableCounterFactory>()
-            .FromSubContainerResolve()
-            .ByNewContextPrefab<CounterInstaller>(_uiCounterPrefab);
+        Container.BindFactory<CounterPresenter, CollectableCounterFactory>()
+            .FromComponentInNewPrefab(_uiCounterPresenterPrefab);
 
-        Container.BindInterfacesAndSelfTo<ProducerModel>().AsTransient();
         Container.BindFactory<ProducerPresenter, ProducerFactory>()
             .FromComponentInNewPrefab(_producerPresenterPrefab);
     }

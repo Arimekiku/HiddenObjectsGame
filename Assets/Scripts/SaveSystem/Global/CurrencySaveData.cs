@@ -12,12 +12,14 @@ public class CurrencySaveData
         CountersData = new List<CounterSaveData>();
     }
 
-    public bool TryAdd(CollectableUICounter counter)
+    public bool TryAdd(CounterPresenter counterPresenter)
     {
-        if (CountersData.Any(c => c.Id == counter.Id))
+        int counterId = counterPresenter.CounterModel.Id.Value;
+        
+        if (CountersData.Any(c => c.Id == counterId))
             return false;
         
-        CountersData.Add(new CounterSaveData(counter.Id));
+        CountersData.Add(new CounterSaveData(counterId));
         return true;
     }
 

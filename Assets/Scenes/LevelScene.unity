@@ -415,14 +415,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ddeb9bf1dbc4ca7b2954a896f0dab97, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _levelData: {fileID: 11400000, guid: 0e5cc82b88900044aa8b4a6291d0b287, type: 2}
   _currencyData: {fileID: 11400000, guid: 186bc59046819e44682878ddd2db01a2, type: 2}
   _producerData: {fileID: 11400000, guid: 0b9c97796d0830c4ea6025acdbf675d6, type: 2}
   _abilitiesData: {fileID: 11400000, guid: 8de97b9bf46152a4fa5620fc6b8cad16, type: 2}
   _collectablePresenterPrefab: {fileID: 839253528119152115, guid: d142f1f0600f91e4790fd0b671309824, type: 3}
   _uiPresenterPrefab: {fileID: 2233218271185456067, guid: 23f5f8a86a24dc94b9cb8fad456edd9f, type: 3}
   _producerPresenterPrefab: {fileID: 6335971538138095763, guid: 7fd69d487e83d94479f4595467f83b59, type: 3}
-  _uiCounterPrefab: {fileID: 38823914948109790, guid: b5821307cb4ce82468d0744bb304c707, type: 3}
+  _uiCounterPresenterPrefab: {fileID: 38823914948109790, guid: b5821307cb4ce82468d0744bb304c707, type: 3}
   _spriteProvider: {fileID: 1507223062}
   _counterContainer: {fileID: 7013018330279852606}
   _currencyProvider: {fileID: 296661041}
@@ -605,14 +604,6 @@ PrefabInstance:
     - target: {fileID: 5582590410759389200, guid: 35947aeb1ef9b8140978984a97f2665f, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5703592467536859517, guid: 35947aeb1ef9b8140978984a97f2665f, type: 3}
-      propertyPath: _coinCounter
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 5703592467536859517, guid: 35947aeb1ef9b8140978984a97f2665f, type: 3}
-      propertyPath: _starCounter
-      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 7649420822610363111, guid: 35947aeb1ef9b8140978984a97f2665f, type: 3}
       propertyPath: m_Name

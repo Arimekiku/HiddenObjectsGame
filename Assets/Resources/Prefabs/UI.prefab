@@ -347,8 +347,8 @@ MonoBehaviour:
   _magnetCost: {fileID: 8930548240389903443}
   _compassButton: {fileID: 4635004505812297539}
   _compassCost: {fileID: 4291923421912027488}
-  _coinCounter: {fileID: 0}
-  _starCounter: {fileID: 0}
+  _coinCounterPresenter: {fileID: 1248391411741255147}
+  _starCounterPresenter: {fileID: 3865390768275737314}
 --- !u!1 &2079560879726653467
 GameObject:
   m_ObjectHideFlags: 0
@@ -691,6 +691,7 @@ GameObject:
   - component: {fileID: 4767907114728620192}
   - component: {fileID: 2275329524943301559}
   - component: {fileID: 5410822893618098947}
+  - component: {fileID: 3865390768275737314}
   m_Layer: 5
   m_Name: StarHolder
   m_TagString: Untagged
@@ -757,6 +758,20 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &3865390768275737314
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3749672068965204265}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cdb4639f4be84818be48b93577ae7a47, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _countText: {fileID: 3975020782363480594}
+  _image: {fileID: 7863828005070628892}
 --- !u!1 &4188703403534497043
 GameObject:
   m_ObjectHideFlags: 0
@@ -1380,8 +1395,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cca32652549b4a0cb1151e594528c49d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <MoneyCounter>k__BackingField: {fileID: 0}
-  <StarCounter>k__BackingField: {fileID: 0}
+  <MoneyCounterPresenter>k__BackingField: {fileID: 1248391411741255147}
+  <StarCounterPresenter>k__BackingField: {fileID: 3865390768275737314}
 --- !u!1 &8142610390091369336
 GameObject:
   m_ObjectHideFlags: 0
@@ -1661,6 +1676,7 @@ GameObject:
   - component: {fileID: 7921358888142803511}
   - component: {fileID: 7438030406773654161}
   - component: {fileID: 4590002245237438546}
+  - component: {fileID: 1248391411741255147}
   m_Layer: 5
   m_Name: CoinHolder
   m_TagString: Untagged
@@ -1727,6 +1743,20 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &1248391411741255147
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8742195547208580500}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cdb4639f4be84818be48b93577ae7a47, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _countText: {fileID: 7794637467234451926}
+  _image: {fileID: 7594815940266220892}
 --- !u!1 &9182013592784907933
 GameObject:
   m_ObjectHideFlags: 0
