@@ -5,18 +5,18 @@ using ModestTree;
 using UniRx;
 using UnityEngine;
 using Zenject;
+using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
 
 public class LevelModel : DisposableEntity
 {
-    [Inject] private LevelSpawnData _data;
     [Inject] private ProducerData _producerData;
     [Inject] private ILevelSpawner _levelSpawner;
-    [Inject] private ILevelSwapper _levelSwapper;
     [Inject] private SaveProvider _saveProvider;
     [Inject] private SpriteProvider _spriteProvider;
+    [Inject] private CameraTracker _cameraTracker;
 
-    public readonly ReactiveCommand<CollectablePresenter> OnCollectableClicked;
+    public ReactiveCommand<CollectablePresenter> OnCollectableClicked;
 
     public bool IsCompleted => _hiddenObjects.IsEmpty() || _hiddenObjects.All(h => h.gameObject.activeSelf == false);
     public IReadOnlyList<CollectablePresenter> HiddenObjects => _hiddenObjects;
@@ -26,86 +26,130 @@ public class LevelModel : DisposableEntity
     private readonly List<ProducerPresenter> _producers;
 
     private Transform levelCenter;
-    
+
     public LevelModel()
     {
-        OnCollectableClicked = new ReactiveCommand<CollectablePresenter>();
-
         _hiddenObjects = new List<CollectablePresenter>();
 
         _producers = new List<ProducerPresenter>();
     }
 
-    public void SetupLevel(Transform center)
+    public void SetupLevel(Transform center, LevelData data)
     {
-        levelCenter = center;
-        
-        SpawnHiddenObjects();
+        OnCollectableClicked = new ReactiveCommand<CollectablePresenter>();
+        _cameraTracker.MainCamera.backgroundColor = data.CameraColor;
 
-        SpawnCoinsAndStars();
+        levelCenter = center;
+
+        SpawnHiddenObjects(data);
+        SpawnCoinsAndStars(data);
     }
 
-    private void SpawnHiddenObjects()
+    public void ClearLevel()
     {
-        if (!_saveProvider.SaveData.EntitiesData.IsEmpty())
-        {
-            foreach (HiddenObjectSaveData entityData in _saveProvider.SaveData.EntitiesData)
-            {
-                CollectablePresenter instance = _levelSpawner.SpawnAndPlaceCollectable(entityData);
-                _hiddenObjects.Add(instance);
-                
-                instance.Model.OnCollect.Subscribe(_ => OnCollectableCollect(instance)).AddTo(this);
-            }
+        Dispose();
 
-            foreach (ProducerSaveData producerData in _saveProvider.SaveData.ProducersData)
-            {
-                ProducerPresenter producer = _levelSpawner.SpawnAndPlaceProducer(producerData);
-                _producers.Add(producer);
-                
-                producer.Model.OnCollect.Subscribe(_ => OnProducerCollect(producer)).AddTo(this);
-            }
-            
+        foreach (var collectable in _hiddenObjects)
+            Object.Destroy(collectable.gameObject);
+        _hiddenObjects.Clear();
+
+        foreach (var producer in _producers)
+            Object.Destroy(producer.gameObject);
+        _producers.Clear();
+
+        _saveProvider.SaveData.ClearData();
+    }
+
+    private void SpawnHiddenObjects(LevelData data)
+    {
+        if (TrySpawnFromSaveFile() == true)
             return;
+
+        SpawnFromData(data);
+    }
+
+    private bool TrySpawnFromSaveFile()
+    {
+        if (_saveProvider.SaveData.EntitiesData.IsEmpty())
+            return false;
+
+        if (_saveProvider.SaveData.EntitiesData.All(s => s.IsEnabled == false))
+            return false;
+
+        foreach (HiddenObjectSaveData entityData in _saveProvider.SaveData.EntitiesData)
+        {
+            CollectablePresenter instance = _levelSpawner.SpawnAndPlaceCollectable(entityData);
+            _hiddenObjects.Add(instance);
+
+            instance.Model.OnCollect.Subscribe(_ => OnCollectableCollect(instance)).AddTo(this);
+            instance.Model.IsEnabled.Subscribe(x =>
+            {
+                HiddenObjectSaveData saveData =
+                    _saveProvider.SaveData.EntitiesData.First(e => e.UniqueId == instance.UniqueId);
+                saveData.IsEnabled = x;
+            }).AddTo(this);
         }
 
-        for (int i = 0; i < _data.MaxSpawnNumber; i++)
+        foreach (ProducerSaveData producerData in _saveProvider.SaveData.ProducersData)
+        {
+            ProducerPresenter producer = _levelSpawner.SpawnAndPlaceProducer(producerData);
+            _producers.Add(producer);
+
+            producer.Model.OnCollect.Subscribe(_ => OnProducerCollect(producer)).AddTo(this);
+        }
+
+        return true;
+    }
+
+    private void SpawnFromData(LevelData data)
+    {
+        for (int i = 0; i < data.MaxSpawnNumber; i++)
         {
             Sprite sprite = _spriteProvider.GetRandomSprite();
 
-            CollectablePresenter instance = _levelSpawner.SpawnAndPlaceCollectable(_data.MaxSpawnRadius, levelCenter, sprite);
-            instance.gameObject.SetActive(false);
+            CollectablePresenter instance =
+                _levelSpawner.SpawnAndPlaceCollectable(data.MaxSpawnRadius, levelCenter, sprite);
+
+            instance.Model.UpdateVisibility(false);
             instance.UniqueId = i;
-            
+
             _hiddenObjects.Add(instance);
             SaveEntity(instance);
 
             instance.Model.OnCollect.Subscribe(_ => OnCollectableCollect(instance)).AddTo(this);
+            instance.Model.IsEnabled.Subscribe(x =>
+            {
+                HiddenObjectSaveData saveData =
+                    _saveProvider.SaveData.EntitiesData.First(e => e.UniqueId == instance.UniqueId);
+                saveData.IsEnabled = x;
+            }).AddTo(this);
         }
-        
-        for (int i = 0; i < _data.ObjectProducersNumber; i++)
+
+        for (int i = 0; i < data.ObjectProducersNumber; i++)
         {
-            ProducerPresenter producer = _levelSpawner.SpawnAndPlaceProducer(_data.MaxSpawnRadius, levelCenter);
-            
+            ProducerPresenter producer = _levelSpawner.SpawnAndPlaceProducer(data.MaxSpawnRadius, levelCenter);
+
             int spriteCode = _spriteProvider.GetRandomSprite().GetHashCode();
             producer.Initialize(spriteCode, i);
-            
+
             _producers.Add(producer);
             SaveProducer(producer);
 
             producer.Model.OnCollect.Subscribe(_ => OnProducerCollect(producer)).AddTo(this);
         }
+
+        for (int i = 0; i < data.InitialSpawnNumber; i++)
+            EnableFirstValidObject();
     }
 
-    private void SpawnCoinsAndStars()
+    private void SpawnCoinsAndStars(LevelData data)
     {
-        for (int i = 0; i < _data.InitialSpawnNumber; i++)
+        for (int i = 0; i < data.InitialSpawnNumber; i++)
         {
-            EnableFirstValidObject();
-            
             //TODO: coins and stars
         }
     }
-    
+
     private void EnableFirstValidObject()
     {
         while (true)
@@ -113,10 +157,10 @@ public class LevelModel : DisposableEntity
             int index = Random.Range(0, _hiddenObjects.Count);
             CollectablePresenter instance = _hiddenObjects[index];
 
-            if (instance.gameObject.activeSelf != false) 
+            if (instance.gameObject.activeSelf != false)
                 continue;
-            
-            _hiddenObjects[index].gameObject.SetActive(true);
+
+            instance.Model.UpdateVisibility(true);
             break;
         }
     }
@@ -124,13 +168,10 @@ public class LevelModel : DisposableEntity
     private void OnCollectableCollect(CollectablePresenter collectable)
     {
         _hiddenObjects.Remove(collectable);
-        
+
         OnCollectableClicked.Execute(collectable);
-        
-        Observable.Timer(TimeSpan.FromSeconds(10f)).Subscribe(_ =>
-        {
-            EnableFirstValidObject();
-        }).AddTo(this);
+
+        Observable.Timer(TimeSpan.FromSeconds(10f)).Subscribe(_ => { EnableFirstValidObject(); }).AddTo(this);
     }
 
     private void OnProducerCollect(ProducerPresenter producer)
@@ -138,18 +179,19 @@ public class LevelModel : DisposableEntity
         _saveProvider.SaveData.UpdateProducer(producer);
 
         var instanceSprite = _spriteProvider.GetConcreteSprite(producer.CreateId);
-        var instance = _levelSpawner.SpawnAndPlaceCollectable(_producerData.SpawnRadius, producer.transform, instanceSprite);
+        var instance =
+            _levelSpawner.SpawnAndPlaceCollectable(_producerData.SpawnRadius, producer.transform, instanceSprite);
 
         while (_hiddenObjects.Any(h => h.UniqueId == instance.UniqueId))
             instance.UniqueId += 1;
-        
+
         _hiddenObjects.Add(instance);
         SaveEntity(instance);
-        
+
         instance.Model.OnCollect.Subscribe(_ =>
         {
             OnCollectableCollect(instance);
-            
+
             _saveProvider.SaveData.EntitiesData.RemoveAll(i => i.UniqueId == instance.UniqueId);
         }).AddTo(this);
     }
@@ -158,8 +200,7 @@ public class LevelModel : DisposableEntity
     {
         var hiddenObjectData = new HiddenObjectSaveData(entity);
         _saveProvider.SaveData.EntitiesData.Add(hiddenObjectData);
-        _saveProvider.Save();
-            
+
         entity.Model.OnCollect.Subscribe(_ =>
         {
             _saveProvider.SaveData.EntitiesData.Remove(hiddenObjectData);
@@ -168,8 +209,7 @@ public class LevelModel : DisposableEntity
     }
 
     private void SaveProducer(ProducerPresenter producer)
-    {   
+    {
         _saveProvider.SaveData.AddProducer(producer);
-        _saveProvider.Save();
     }
 }

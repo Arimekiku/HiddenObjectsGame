@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using UniRx;
 using UnityEngine;
 using Zenject;
@@ -17,33 +16,37 @@ public class LevelPresenter : MonoBehaviour
     private async void Awake()
     {
         await _spriteProvider.LoadSprites();
-        
-        if (_saveProvider.TryLoad() == false)
-        {
-            _saveProvider.SaveData = new LevelSaveData();
-            _saveProvider.CurrencyData = new CurrencySaveData(new List<CollectableUICounter>());
-        }
-        
-        _model.SetupLevel(transform);
-        _uiSpawner.CreateCounters(_model.HiddenObjects.ToList(), _model.Producers.ToList());
-        
-        _model.OnCollectableClicked.Subscribe(OnCollectableClicked);
+
+        LoadLevel(_levelSwapper.LoadCurrentLevel());
     }
 
     private void OnCollectableClicked(CollectablePresenter collectable)
     {
         if (_model.IsCompleted)
         {
-            _model.Dispose();
-            _saveProvider.SaveData.ClearData();
-            _saveProvider.Save();
-            
-            _levelSwapper.LoadNextLevel();
+            Destroy(collectable.gameObject);
+            StartNextLevel();
             return;
         }
         
         _uiSpawner.CollectAnimation(collectable);
-        _saveProvider.Save();
         collectable.gameObject.SetActive(false);
+    }
+
+    private void StartNextLevel()
+    {
+        _model.ClearLevel();
+        _uiSpawner.ClearCounters();
+        
+        LoadLevel(_levelSwapper.LoadNextLevel());
+    }
+
+    private void LoadLevel(LevelData data)
+    {
+        _model.SetupLevel(transform, data);
+        _uiSpawner.CreateCounters(_model.HiddenObjects.ToList(), _model.Producers.ToList());
+
+        _saveProvider.Save();
+        _model.OnCollectableClicked.Subscribe(OnCollectableClicked);
     }
 }

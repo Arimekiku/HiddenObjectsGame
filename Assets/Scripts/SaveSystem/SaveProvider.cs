@@ -1,6 +1,6 @@
-﻿using UnityEngine.SceneManagement;
+﻿using Zenject;
 
-public class SaveProvider
+public class SaveProvider : IInitializable
 {
     private readonly string _localSaveFilename;
     private readonly string _globalSaveFilename;
@@ -15,6 +15,15 @@ public class SaveProvider
         
         _localSaveFilename = "Level.txt";
         _globalSaveFilename = "Currency.txt";
+    }
+    
+    public void Initialize()
+    {
+        if (TryLoad() != false) 
+            return;
+        
+        SaveData = new LevelSaveData(0);
+        CurrencyData = new CurrencySaveData();
     }
 
     public void Save()

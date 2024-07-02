@@ -5,15 +5,23 @@ using System.Linq;
 [Serializable]
 public class LevelSaveData
 {
+    public int LevelIndex;
     public List<CounterSaveData> CountersData;
     public List<HiddenObjectSaveData> EntitiesData;
     public List<ProducerSaveData> ProducersData;
 
-    public LevelSaveData()
+    public LevelSaveData(int levelIndex)
     {
+        LevelIndex = levelIndex;
+        
         CountersData = new List<CounterSaveData>();
         EntitiesData = new List<HiddenObjectSaveData>();
         ProducersData = new List<ProducerSaveData>();
+    }
+
+    public void UpdateIndex(int index)
+    {
+        LevelIndex = index;
     }
     
     public void AddCounter(int id)

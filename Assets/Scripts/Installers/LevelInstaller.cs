@@ -4,7 +4,6 @@ using Zenject;
 public class LevelInstaller : MonoInstaller<LevelInstaller>
 {
     [Header("Configs")]
-    [SerializeField] private LevelSpawnData _levelSpawnData;
     [SerializeField] private LevelCurrencyData _currencyData;
     [SerializeField] private ProducerData _producerData;
     [SerializeField] private AbilitiesData _abilitiesData;
@@ -42,7 +41,6 @@ public class LevelInstaller : MonoInstaller<LevelInstaller>
 
     private void BindConfig()
     {
-        Container.BindInstance(_levelSpawnData);
         Container.BindInstance(_currencyData);
         Container.BindInstance(_producerData);
         Container.BindInstance(_abilitiesData);
@@ -50,7 +48,7 @@ public class LevelInstaller : MonoInstaller<LevelInstaller>
 
     private void BindProviders()
     {
-        Container.Bind<CurrencyProvider>().FromInstance(_currencyProvider).AsSingle();
+        Container.BindInstance(_currencyProvider).AsSingle();
         Container.BindInterfacesAndSelfTo<SpriteProvider>().FromInstance(_spriteProvider).AsSingle();
     }
 

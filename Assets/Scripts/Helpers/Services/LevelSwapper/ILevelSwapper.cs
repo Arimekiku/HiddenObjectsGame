@@ -1,4 +1,5 @@
 ﻿public interface ILevelSwapper
 {
-    public void LoadNextLevel();
+    public LevelData LoadNextLevel();
+    public LevelData LoadCurrentLevel();
 }

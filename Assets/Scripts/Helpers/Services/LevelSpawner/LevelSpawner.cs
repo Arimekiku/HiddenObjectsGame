@@ -3,14 +3,15 @@ using Random = UnityEngine.Random;
 
 public class LevelSpawner : ILevelSpawner
 {
-    private readonly LevelSpawnData _levelSpawnData;
+    private const float MAX_OBJECT_SCALE = 3;
+    private const float MIN_OBJECT_SCALE = 0.5f;
+    
     private readonly CollectableFactory _collectableFactory;
     private readonly ProducerFactory _producerFactory;
     private readonly ISpriteProvider _spriteProvider;
 
-    private LevelSpawner(LevelSpawnData levelSpawnData, CollectableFactory collectableFactory, ISpriteProvider spriteProvider, ProducerFactory producerFactory)
+    private LevelSpawner(CollectableFactory collectableFactory, ISpriteProvider spriteProvider, ProducerFactory producerFactory)
     {
-        _levelSpawnData = levelSpawnData;
         _collectableFactory = collectableFactory;
         _producerFactory = producerFactory;
         _spriteProvider = spriteProvider;
@@ -24,7 +25,7 @@ public class LevelSpawner : ILevelSpawner
         Vector2 randomPoint = GetRandomPointInCircle(radius, center);
         instance.transform.position = randomPoint;
 
-        float randomMultiplier = Random.Range(0.5f, _levelSpawnData.MaxInstanceScale);
+        float randomMultiplier = Random.Range(MIN_OBJECT_SCALE, MAX_OBJECT_SCALE);
         instance.transform.localScale *= randomMultiplier;
 
         float randomRotation = Random.Range(0f, 360);
@@ -36,7 +37,9 @@ public class LevelSpawner : ILevelSpawner
     public CollectablePresenter SpawnAndPlaceCollectable(HiddenObjectSaveData saveData)
     {
         CollectablePresenter instance = _collectableFactory.Create();
-        instance.gameObject.SetActive(saveData.IsEnabled);
+        instance.Model.UpdateVisibility(saveData.IsEnabled);
+
+        instance.UniqueId = saveData.UniqueId;
 
         Sprite concreteSprite = _spriteProvider.GetConcreteSprite(saveData.SpriteId);
         instance.Model.UpdateSprite(concreteSprite);
@@ -68,6 +71,9 @@ public class LevelSpawner : ILevelSpawner
         
         instance.Initialize(saveData.CreateId, saveData.UniqueId);
         instance.Model.Initialize(saveData.IsCollected);
+        
+        Sprite sprite = _spriteProvider.GetProducerSprite();
+        instance.Model.UpdateSprite(sprite);
         
         instance.transform.position = saveData.Position;
 

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
 using UnityEngine;
@@ -14,12 +15,10 @@ public class CounterProvider : MonoBehaviour
     [Inject] private CameraTracker _cameraTracker;
     [Inject] private SpriteProvider _spriteProvider;
     
-    private List<CollectableUICounter> _holders;
-    
+    private readonly List<CollectableUICounter> _holders = new();
+
     public void CreateCounters(List<CollectablePresenter> collectables, List<ProducerPresenter> producers)
     {
-        _holders = new List<CollectableUICounter>();
-        
         foreach (var collectable in collectables)
         {
             int spriteCode = collectable.Model.Sprite.Value.GetHashCode();
@@ -48,6 +47,13 @@ public class CounterProvider : MonoBehaviour
         }
     }
 
+    public void ClearCounters()
+    {
+        foreach (var counter in _holders)
+            Destroy(counter.gameObject);
+        _holders.Clear();
+    }
+
     public void CollectAnimation(CollectablePresenter presenter)
     {
         CollectableUIPresenter instance = _uiFactory.Create(presenter);
@@ -69,8 +75,8 @@ public class CounterProvider : MonoBehaviour
             .OnComplete(() =>
             {
                 counterUI.UpdateText();
-                DestroyImmediate(presenter.gameObject);
-                DestroyImmediate(instance.gameObject);
+                Destroy(presenter.gameObject);
+                Destroy(instance.gameObject);
             });
     }
 
