@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
+using ModestTree;
 using UnityEngine;
 using Zenject;
 
@@ -20,39 +20,11 @@ public class CounterProvider : MonoBehaviour
 
     public void CreateCounters(List<CollectablePresenter> collectables, List<ProducerPresenter> producers)
     {
-        _holders.Add(_currencyProvider.MoneyCounterPresenter);
-        _holders.Add(_currencyProvider.StarCounterPresenter);
+        LoadCurrency();
+        if (TryLoadCountersFromFile())
+            return;
         
-        foreach (var collectable in collectables)
-        {
-            int spriteCode = collectable.Model.Sprite.Value.GetHashCode();
-            
-            CounterPresenter counterPresenter = CreateUiCounter(spriteCode);
-            counterPresenter?.UpdateImage(collectable.Model.Sprite.Value);
-        }
-        
-        foreach (var producer in producers)
-        {
-            int spriteCode = producer.CreateId;
-
-            CounterPresenter counterPresenter = CreateUiCounter(spriteCode);
-            counterPresenter?.UpdateImage(_spriteProvider.GetConcreteSprite(spriteCode));
-        }
-
-        foreach (var counter in _holders)
-        {
-            List<CounterSaveData> _allCounters = new List<CounterSaveData>(_saveProvider.SaveData.CountersData);
-            _allCounters.AddRange(_saveProvider.CurrencyData.CountersData);
-            
-            foreach (var counterData in _allCounters)
-            {
-                if (counterData.Id != counter.CounterModel.Id.Value) 
-                    continue;
-                
-                counter.CounterModel.Count.Value = counterData.Count;
-                counter.UpdateText();
-            }
-        }
+        LoadFromCollection(collectables, producers);
     }
 
     public void ClearCounters()
@@ -70,23 +42,27 @@ public class CounterProvider : MonoBehaviour
         CollectableUIPresenter instance = _uiFactory.Create(presenter);
         instance.transform.SetParent(_parent.transform, false);
         instance.transform.position = _cameraTracker.MainCamera.WorldToScreenPoint(presenter.transform.position);
+        instance.transform.rotation = presenter.transform.rotation;
+        instance.transform.localScale = presenter.transform.localScale;
 
         CounterPresenter counterPresenterUI = _holders.First(h => h.CounterModel.Id.Value == presenter.Model.Sprite.Value.GetHashCode());
-        
+        Destroy(presenter.gameObject);
+
         counterPresenterUI.CounterModel.AddDelta();
 
         int counterId = counterPresenterUI.CounterModel.Id.Value;
         _saveProvider.SaveData.UpdateCounter(counterId, counterPresenterUI.CounterModel.Count.Value);
         _saveProvider.CurrencyData.TrySave(counterId, counterPresenterUI.CounterModel.Count.Value);
         _saveProvider.Save();
-        
+
+        instance.transform.DORotate(counterPresenterUI.transform.rotation.eulerAngles, 0.5f);
+        instance.transform.DOScale(counterPresenterUI.transform.localScale, 0.5f);
         instance.transform
             .DOMove(counterPresenterUI.transform.position, 0.5f)
             .SetEase(Ease.OutQuad)
             .OnComplete(() =>
             {
                 counterPresenterUI.UpdateText();
-                Destroy(presenter.gameObject);
                 Destroy(instance.gameObject);
             });
     }
@@ -105,5 +81,62 @@ public class CounterProvider : MonoBehaviour
             
         _holders.Add(uiCounterPresenter);
         return uiCounterPresenter;
+    }
+
+    private bool TryLoadCountersFromFile()
+    {
+        if (_saveProvider.SaveData.CountersData.IsEmpty())
+            return false;
+        
+        foreach (var counterData in _saveProvider.SaveData.CountersData)
+        {
+            int spriteCode = counterData.Id;
+            if (_holders.Any(c => c.CounterModel.Id.Value == spriteCode)) 
+                continue;
+            
+            CounterPresenter counterPresenter = CreateUiCounter(spriteCode);
+                
+            Sprite counterSprite = _spriteProvider.GetConcreteSprite(spriteCode);
+            if (counterPresenter == null) 
+                continue;
+            
+            counterPresenter.UpdateImage(counterSprite);
+            counterPresenter.CounterModel.Count.Value = counterData.Count;
+            counterPresenter.UpdateText();
+        }
+
+        return true;
+    }
+
+    private void LoadFromCollection(List<CollectablePresenter> collectables, List<ProducerPresenter> producers)
+    {
+        foreach (var collectable in collectables)
+        {
+            int spriteCode = collectable.Model.Sprite.Value.GetHashCode();
+            
+            CounterPresenter counterPresenter = CreateUiCounter(spriteCode);
+            counterPresenter?.UpdateImage(collectable.Model.Sprite.Value);
+        }
+        
+        foreach (var producer in producers)
+        {
+            int spriteCode = producer.CreateId;
+
+            CounterPresenter counterPresenter = CreateUiCounter(spriteCode);
+            counterPresenter?.UpdateImage(_spriteProvider.GetConcreteSprite(spriteCode));
+        }
+    }
+
+    private void LoadCurrency()
+    {
+        _holders.Add(_currencyProvider.MoneyCounterPresenter);
+        _holders.Add(_currencyProvider.StarCounterPresenter);
+        
+        foreach (var currencyData in _saveProvider.CurrencyData.CountersData)
+        {
+            var holder = _holders.First(c => c.CounterModel.Id.Value == currencyData.Id);
+            holder.CounterModel.Count.Value = currencyData.Count;
+            holder.UpdateText();
+        }
     }
 }

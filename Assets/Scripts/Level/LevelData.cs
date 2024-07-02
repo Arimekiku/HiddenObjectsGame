@@ -7,6 +7,5 @@ public class LevelData : ScriptableObject
     [field: SerializeField] public uint MaxSpawnNumber { get; private set; }
     [field: SerializeField] public uint InitialSpawnNumber { get; private set; }
     [field: SerializeField] public uint ObjectProducersNumber { get; private set; }
-    [field: SerializeField] public uint MaxInstanceScale { get; private set; }
     [field: SerializeField] public Color CameraColor { get; private set; }
 }
