@@ -4,7 +4,8 @@ using Zenject;
 
 public class ProducerPresenter : MonoBehaviour
 {
-    public int Id;
+    public int UniqueId;
+    public int CreateId;
     
     [SerializeField] private SpriteRenderer _renderer;
 
@@ -16,6 +17,12 @@ public class ProducerPresenter : MonoBehaviour
     {
         _producerModel.Sprite.Subscribe(HandleSprite).AddTo(this);
         _producerModel.IsCollected.Subscribe(HandleOpacity).AddTo(this);
+    }
+
+    public void Initialize(int createId, int uniqueId)
+    {
+        CreateId = createId;
+        UniqueId = uniqueId;
     }
 
     private void HandleSprite(Sprite sprite)

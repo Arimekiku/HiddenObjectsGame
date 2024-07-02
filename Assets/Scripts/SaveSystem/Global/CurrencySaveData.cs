@@ -7,16 +7,16 @@ public class CurrencySaveData
 {
     public List<CounterSaveData> CountersData;
 
-    public CurrencySaveData()
+    public CurrencySaveData(List<CollectableUICounter> counters)
     {
         CountersData = new List<CounterSaveData>();
-        foreach (CollectableType type in Constants.Currency)
-            CountersData.Add(new CounterSaveData(type));
+        foreach (CollectableUICounter counter in counters)
+            CountersData.Add(new CounterSaveData(counter.Id));
     }
 
-    public bool TrySave(CollectableType type, int newData)
+    public bool TrySave(int id, int newData)
     {
-        CounterSaveData saveData = CountersData.FirstOrDefault(c => c.Type == type);
+        CounterSaveData saveData = CountersData.FirstOrDefault(c => c.Id == id);
         if (saveData == null)
             return false;
         

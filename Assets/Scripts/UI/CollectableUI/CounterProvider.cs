@@ -7,44 +7,60 @@ using Zenject;
 public class CounterProvider : MonoBehaviour
 {
     [SerializeField] private Canvas _parent;
-    [SerializeField] private CollectableUICounter[] _holders;
-
+    
     [Inject] private CollectableUIFactory _uiFactory;
-    [Inject] private CameraTracker _tracker;
+    [Inject] private CollectableCounterFactory _counterFactory;
     [Inject] private SaveProvider _saveProvider;
     [Inject] private CameraTracker _cameraTracker;
-
-    private void Awake()
+    [Inject] private SpriteProvider _spriteProvider;
+    
+    private List<CollectableUICounter> _holders;
+    
+    public void CreateCounters(List<CollectablePresenter> collectables, List<ProducerPresenter> producers)
     {
-        List<CounterSaveData> allCounters = new List<CounterSaveData>(_saveProvider.CurrencyData.CountersData);
-        allCounters.AddRange(_saveProvider.SaveData.CountersData);
+        _holders = new List<CollectableUICounter>();
         
-        foreach (CounterSaveData counterData in allCounters)
+        foreach (var collectable in collectables)
         {
-            foreach (CollectableUICounter uiCounter in _holders)
+            int spriteCode = collectable.Model.Sprite.Value.GetHashCode();
+            
+            CollectableUICounter counter = CreateUiCounter(spriteCode);
+            counter?.UpdateImage(collectable.Model.Sprite.Value);
+        }
+        
+        foreach (var producer in producers)
+        {
+            int spriteCode = producer.CreateId;
+
+            CollectableUICounter counter = CreateUiCounter(spriteCode);
+            counter?.UpdateImage(_spriteProvider.GetConcreteSprite(spriteCode));
+        }
+
+        foreach (var counter in _holders)
+        {
+            foreach (var counterData in _saveProvider.SaveData.CountersData)
             {
-                if (uiCounter.Counter.Type != counterData.Type) 
+                if (counterData.Id != counter.Id) 
                     continue;
                 
-                uiCounter.Counter.Count.Value = counterData.Count;
-                uiCounter.UpdateText();
-                break;
+                counter.Counter.Count.Value = counterData.Count;
             }
         }
     }
 
-    public void CollectAnimation(CollectablePresenter presenter, int changeValue)
+    public void CollectAnimation(CollectablePresenter presenter)
     {
-        CollectableUIPresenter instance = _uiFactory.Create(presenter.Model);
+        CollectableUIPresenter instance = _uiFactory.Create(presenter);
         instance.transform.SetParent(_parent.transform, false);
         instance.transform.position = _cameraTracker.MainCamera.WorldToScreenPoint(presenter.transform.position);
 
-        CollectableUICounter counterUI = _holders.First(h => h.Counter.Type == presenter.Model.Type);
+        CollectableUICounter counterUI = _holders.First(h => h.Id == presenter.Model.Sprite.Value.GetHashCode());
         
-        counterUI.Counter.Add(changeValue);
+        //TODO: make this frexible
+        counterUI.Counter.Add(1);
         
-        _saveProvider.SaveData.TrySave(counterUI.Counter.Type, counterUI.Counter.Count.Value);
-        _saveProvider.CurrencyData.TrySave(counterUI.Counter.Type, counterUI.Counter.Count.Value);
+        _saveProvider.SaveData.UpdateCounter(counterUI.Id, counterUI.Counter.Count.Value);
+        _saveProvider.CurrencyData.TrySave(counterUI.Id, counterUI.Counter.Count.Value);
         _saveProvider.Save();
         
         instance.transform
@@ -53,7 +69,23 @@ public class CounterProvider : MonoBehaviour
             .OnComplete(() =>
             {
                 counterUI.UpdateText();
+                DestroyImmediate(presenter.gameObject);
                 DestroyImmediate(instance.gameObject);
             });
+    }
+
+    private CollectableUICounter CreateUiCounter(int spriteCode)
+    {
+        if (_holders.Any(h => h.Id == spriteCode))
+            return null;
+            
+        CollectableUICounter uiCounter = _counterFactory.Create(spriteCode);
+        _saveProvider.SaveData.AddCounter(uiCounter.Id);
+        
+        uiCounter.transform.SetParent(transform, false);
+        uiCounter.UpdateText();
+            
+        _holders.Add(uiCounter);
+        return uiCounter;
     }
 }

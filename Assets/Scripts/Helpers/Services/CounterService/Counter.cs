@@ -2,19 +2,11 @@
 
 public class Counter : ICounter
 {
-    public CollectableType Type { get; private set; }
     public IntReactiveProperty Count { get; }
     
     public Counter()
     {
         Count = new IntReactiveProperty(0);
-        
-        Type = CollectableType.Empty;
-    }
-
-    public void Initialize(CollectableType type)
-    {
-        Type = type;
     }
     
     public void Add(int value)

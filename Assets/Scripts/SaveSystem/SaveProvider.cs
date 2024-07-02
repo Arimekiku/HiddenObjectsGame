@@ -13,7 +13,7 @@ public class SaveProvider
     {
         _saveMaker = saveMaker;
         
-        _localSaveFilename = string.Format($"Level_{SceneManager.GetActiveScene().buildIndex}.txt");
+        _localSaveFilename = "Level.txt";
         _globalSaveFilename = "Currency.txt";
     }
 
@@ -23,9 +23,11 @@ public class SaveProvider
         _saveMaker.Save(CurrencyData, _globalSaveFilename);
     }
 
-    public void Load()
+    public bool TryLoad()
     {
-        SaveData = _saveMaker.Load<LevelSaveData>(_localSaveFilename) ?? new LevelSaveData();
-        CurrencyData = _saveMaker.Load<CurrencySaveData>(_globalSaveFilename) ?? new CurrencySaveData();
+        SaveData = _saveMaker.Load<LevelSaveData>(_localSaveFilename);
+        CurrencyData = _saveMaker.Load<CurrencySaveData>(_globalSaveFilename);
+
+        return SaveData != null && CurrencyData != null;
     }
 }

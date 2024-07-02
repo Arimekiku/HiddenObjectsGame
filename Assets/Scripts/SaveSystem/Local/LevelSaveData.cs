@@ -12,16 +12,21 @@ public class LevelSaveData
     public LevelSaveData()
     {
         CountersData = new List<CounterSaveData>();
-        foreach (CollectableType type in Constants.HiddenObjects)
-            CountersData.Add(new CounterSaveData(type));
-
         EntitiesData = new List<HiddenObjectSaveData>();
         ProducersData = new List<ProducerSaveData>();
     }
-
-    public bool TrySave(CollectableType type, int newData)
+    
+    public void AddCounter(int id)
     {
-        CounterSaveData saveData = CountersData.FirstOrDefault(c => c.Type == type);
+        if (CountersData.Any(c => c.Id == id))
+            return;
+        
+        CountersData.Add(new CounterSaveData(id));
+    }
+
+    public bool UpdateCounter(int id, int newData)
+    {
+        var saveData = CountersData.FirstOrDefault(c => c.Id == id);
         
         if (saveData == null)
             return false;
@@ -29,18 +34,25 @@ public class LevelSaveData
         saveData.Count = newData;
         return true;
     }
+
+    public void AddProducer(ProducerPresenter producer)
+    {
+        if (ProducersData.Any(p => p.UniqueId == producer.UniqueId))
+            return;
+        
+        ProducersData.Add(new ProducerSaveData(producer));
+    }
+    
+    public void UpdateProducer(ProducerPresenter producer)
+    {
+        var saveData = ProducersData.First(p => p.UniqueId == producer.UniqueId);
+        saveData.IsCollected = producer.Model.IsCollected.Value;
+    }
     
     public void ClearData()
     {
-        foreach (CounterSaveData data in CountersData)
-            data.Count = 0;
-
+        EntitiesData.Clear();
+        CountersData.Clear();
         ProducersData.Clear();
-    }
-
-    public void UpdateProducer(ProducerPresenter producer)
-    {
-        ProducerSaveData saveData = ProducersData.First(p => p.Id == producer.Id);
-        saveData.IsCollected = producer.Model.IsCollected.Value;
     }
 }

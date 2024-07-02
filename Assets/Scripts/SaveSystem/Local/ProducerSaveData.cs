@@ -6,14 +6,16 @@ public class ProducerSaveData
 {
     public Vector3 Position;
     public bool IsCollected;
-    public int Id;
+    public int UniqueId;
+    public int CreateId;
     
-    public ProducerSaveData(Matrix4x4 moveMatrix, bool collected, int id)
+    public ProducerSaveData(ProducerPresenter producer)
     {
-        Position = moveMatrix.GetPosition();
-        
-        IsCollected = collected;
+        Position = producer.transform.position;
 
-        Id = id;
+        IsCollected = producer.Model.IsCollected.Value;
+
+        UniqueId = producer.UniqueId;
+        CreateId = producer.CreateId;
     }
 }

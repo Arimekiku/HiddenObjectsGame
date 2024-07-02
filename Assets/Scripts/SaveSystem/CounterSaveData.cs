@@ -4,11 +4,11 @@
 public class CounterSaveData
 {
     public int Count;
-    public CollectableType Type;
+    public int Id;
 
-    public CounterSaveData(CollectableType type)
+    public CounterSaveData(int id)
     {
-        Type = type;
+        Id = id;
         Count = 0;
     }
 }

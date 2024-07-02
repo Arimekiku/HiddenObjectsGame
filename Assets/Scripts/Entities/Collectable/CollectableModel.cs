@@ -3,24 +3,16 @@ using UnityEngine;
 
 public class CollectableModel
 {
-    public CollectableType Type { get; private set; }
-    
-    public ReactiveProperty<Sprite> Sprite { get; }
-    
+    public IReadOnlyReactiveProperty<Sprite> Sprite => _sprite;
     public ReactiveCommand OnCollect { get; }
+
+    private readonly ReactiveProperty<Sprite> _sprite;
 
     public CollectableModel()
     {
-        Sprite = new ReactiveProperty<Sprite>();
+        _sprite = new ReactiveProperty<Sprite>(null);
 
         OnCollect = new ReactiveCommand();
-        
-        Type = CollectableType.Empty;
-    }
-
-    public void Initialize(CollectableType type)
-    {
-        Type = type;
     }
 
     public void Collect()
@@ -30,6 +22,6 @@ public class CollectableModel
 
     public void UpdateSprite(Sprite sprite)
     {
-        Sprite.Value = sprite;
+        _sprite.Value = sprite;
     }
 }

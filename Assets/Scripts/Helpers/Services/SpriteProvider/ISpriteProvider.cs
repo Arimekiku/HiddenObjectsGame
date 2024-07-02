@@ -3,5 +3,10 @@ using UnityEngine;
 
 public interface ISpriteProvider
 {
-    public Task<Sprite> Load(string id);
+    public Task LoadSprites();
+    public Sprite GetRandomSprite();
+    public Sprite GetConcreteSprite(int spriteCode);
+    public Sprite GetProducerSprite();
+    public Sprite GetCoinSprite();
+    public Sprite GetStarSprite();
 }

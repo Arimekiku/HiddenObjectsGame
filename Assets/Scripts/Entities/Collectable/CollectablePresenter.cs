@@ -4,6 +4,8 @@ using Zenject;
 
 public class CollectablePresenter : MonoBehaviour
 {
+    public int UniqueId { get; set; }
+    
     [SerializeField] private SpriteRenderer _renderer;
 
     public CollectableModel Model => _model;
@@ -13,17 +15,12 @@ public class CollectablePresenter : MonoBehaviour
     
     private void Awake()
     {
-        _model.Sprite.Subscribe(HandleSprite).AddTo(this);
+        _model.Sprite.Where(s => s != null).Subscribe(HandleSprite).AddTo(this);
     }
 
     private void HandleSprite(Sprite sprite)
     {
         _renderer.sprite = sprite;
-    }
-
-    public void Initialize(CollectableType type)
-    {
-        _model.Initialize(type);
     }
 }
 

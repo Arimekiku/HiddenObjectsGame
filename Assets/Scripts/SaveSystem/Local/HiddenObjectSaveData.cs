@@ -7,14 +7,19 @@ public class HiddenObjectSaveData
     public Vector3 Position;
     public Vector3 Rotation;
     public Vector3 Scale;
-    public CollectableType Type;
+    public bool IsEnabled;
+    public int UniqueId;
+    public int SpriteId;
 
-    public HiddenObjectSaveData(Matrix4x4 moveMatrix, CollectableType type)
+    public HiddenObjectSaveData(CollectablePresenter collectable)
     {
-        Position = moveMatrix.GetPosition();
-        Rotation = moveMatrix.rotation.eulerAngles;
-        Scale = moveMatrix.lossyScale;
+        Position = collectable.transform.position;
+        Rotation = collectable.transform.rotation.eulerAngles;
+        Scale = collectable.transform.lossyScale;
+
+        IsEnabled = collectable.gameObject.activeSelf;
         
-        Type = type;
+        UniqueId = collectable.UniqueId;
+        SpriteId = collectable.Model.Sprite.Value.GetHashCode();
     }
 }

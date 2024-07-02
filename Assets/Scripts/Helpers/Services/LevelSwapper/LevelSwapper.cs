@@ -1,19 +1,10 @@
-﻿using UnityEngine.SceneManagement;
-using Zenject;
-
-public class LevelSwapper : ILevelSwapper, IInitializable
+﻿
+public class LevelSwapper : ILevelSwapper
 {
-    private int _levelCount = 2;
-
-    public void Initialize()
-    {
-        _levelCount = SceneManager.sceneCountInBuildSettings;
-    }
+    private int _levelCount = 1;
     
     public void LoadNextLevel()
     {
-        Scene currentScene = SceneManager.GetActiveScene();
         
-        SceneManager.LoadScene((currentScene.buildIndex + 1) % _levelCount);
     }
 }
