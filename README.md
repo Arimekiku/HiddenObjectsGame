@@ -12,8 +12,7 @@ This is my test task on hidden object game.
 You can check the result by downloading project or check out the video:
 
 
-
-https://github.com/Arimekiku/HiddenObjectsGame/assets/111116652/616a3c0d-ffb9-4530-a96d-b24c3b85995d
+https://github.com/Arimekiku/HiddenObjectsGame/assets/111116652/ad7fe2db-1b17-457b-bf87-591a48c8dfb1
 
 
 ## Weak points
