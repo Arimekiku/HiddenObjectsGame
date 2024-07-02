@@ -16,8 +16,8 @@ https://github.com/Arimekiku/HiddenObjectsGame/assets/111116652/ad7fe2db-1b17-45
 
 
 ## Weak points
-1. Low flexibility in terms of adding new items;
-2. Low flexibility in terms of adding new levels.
+1. Low flexibility in terms of adding new items (fixed);
+2. Low flexibility in terms of adding new levels (fixed).
 
 This prototype was made for unirx and zenject practice so there's some crucial weak points that cannot allow this prototype to evolve into a commercial game.
 
